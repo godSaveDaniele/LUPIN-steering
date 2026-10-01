@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+.DS_Store
+models/
+*.pth
+suffix_*.txt
+examples_*.jsnol

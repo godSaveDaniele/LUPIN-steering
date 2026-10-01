@@ -23,14 +23,15 @@ set_seed(seed)
 
 
 def train_fn(model, train_loader, optimizer, device, criterion):
-    model.train()
+    model.train() #metti il modello in modalità training 
     total_loss = 0
     for X_train_batch in train_loader:
-        input_ids = X_train_batch['input_ids'].to(device)
+        input_ids = X_train_batch['input_ids'].to(device) #[8*512 interi che rappresnetano token]
         attention_mask = X_train_batch['attention_mask'].to(device)
-        optimizer.zero_grad()
-        output = model(input_ids, attention_mask)
-        loss = 0
+        optimizer.zero_grad() #prima di aggiornare i gradienti del bathc corrente vengono aggiornati quelli del batch precedente
+        output = model(input_ids, attention_mask) #avviene la fase di forward per quel batch
+        # l'output dovrebbe essere della forma [B * MAX_LEN * NUM_ACTIVITIES]
+        loss = 0 
         for o, c, l in zip(output, criterion, X_train_batch['labels']):
             loss += criterion[c](o.to(device), X_train_batch['labels'][l].to(device))
         loss.backward()
@@ -63,7 +64,7 @@ def train_llm(model, train_data_loader, valid_data_loader, optimizer, EPOCHS, cr
 
             if valid_loss < best_valid_loss:
                 best_valid_loss = valid_loss
-                best_model = model
+                best_model = model ######
                 early_stop_counter = 0  # Reset early stopping counter
             else:
                 early_stop_counter += 1
@@ -79,7 +80,7 @@ def train_llm(model, train_data_loader, valid_data_loader, optimizer, EPOCHS, cr
 
 if __name__ == '__main__':
 
-    MAX_LEN = 512
+    MAX_LEN = 512  
     BATCH_SIZE = 8
     LEARNING_RATE = 1e-5
     EPOCHS = 50
@@ -87,37 +88,49 @@ if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print('device-->', device)
     csv_log = sys.argv[1]
-    Log(csv_log, TYPE)
+    Log(csv_log, TYPE)  #effettuare il pre-processing
 
     with open('log_history/'+csv_log+'/'+csv_log+'_id2label_'+TYPE+'.pkl', 'rb') as f:
         id2label = pickle.load(f)
+        #dizionario che ha per chiave il nome degli attributi e per valore un dizionario ch associa ad ogni id uno dei valore che assume quell'attributo
 
     with open('log_history/'+csv_log+'/'+csv_log+'_label2id_'+TYPE+'.pkl', 'rb') as f:
         label2id = pickle.load(f)
 
     with open('log_history/'+csv_log+'/'+csv_log+'_train_'+TYPE+'.pkl', 'rb') as f:
         train = pickle.load(f)
+        #lista che contiene tutti i prefissi di training trasformati in formato testaule
 
     with open('log_history/'+csv_log+'/'+csv_log+'_label_train_'+TYPE+'.pkl', 'rb') as f:
         y_train = pickle.load(f)
+        #contiene una lista con tutte le next activity (una per ogni prefisso)
+        #attenzione non contiene il suffisso per intero
+        #le activity sono sottoforma di id
 
     with open('log_history/'+csv_log+'/'+csv_log+'_suffix_train_'+TYPE+'.pkl', 'rb') as f:
         y_train_suffix = pickle.load(f)
+        #dizionario che contiene per ogni posizione futura la lista di activity che assumerà in corrispondenza dei diversi prefissi
+
 
 
     train_input, val_input = train_test_split(train, test_size=0.2, random_state=42)
-    train_label = {}
+    train_label = {} 
     val_label = {}
+    # equivalenti y_train_suffix ma splitate per training e validation
 
     for key in y_train_suffix.keys():
         train_label[key], val_label[key] = train_test_split(y_train_suffix[key], test_size=0.2, random_state=42)
 
+
     tokenizer = AutoTokenizer.from_pretrained('prajjwal1/bert-medium', truncation_side='left')
+    # se devo troncare qualcosa, tronco la parte di sinistra (predilifo gli eventi più recenti)
     model = AutoModel.from_pretrained('prajjwal1/bert-medium')
+
     output_sizes = []
 
-    for i in range(len(y_train_suffix)):
+    for i in range(len(y_train_suffix)):   #max length
         output_sizes.append(len(id2label['activity']))
+        #alla fine ho una lista di max_length volte il numero di etichette da predire. 
 
     train_dataset = CustomDataset(train_input, train_label, tokenizer, MAX_LEN)
     val_dataset = CustomDataset(val_input, val_label, tokenizer, MAX_LEN)
@@ -132,8 +145,11 @@ if __name__ == '__main__':
 
     for l in y_train_suffix:
         criterion[l] = torch.nn.CrossEntropyLoss()
+        #crea tanyte istanze di cross Entropy Loss (una per ogni posizione futura)
+
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE)
+    #Il fine tuning avviene su tutti i parametri del modello, incluse le teste di classificazione
 
     startTime = time.time()
     bert_model = train_llm(model, train_loader, val_loader, optimizer, EPOCHS, criterion)
