@@ -5,15 +5,26 @@ import numpy as np
 import pickle
 import torch
 from itertools import chain, repeat, islice
+from pathlib import Path
+from constraints.extraction import EVALUATORS
 
 # Prende un event log csv e lo trasforma nei dati che verranno passati a BERT.
 # Genera i prefissi delle tracce, le label, divide in train e test set
 # e serializza tutto in file.pkl
 
 class Log():
-    def __init__(self, log, setting):
+    def __init__(self, log, setting, constraint=None):
         self.__log_name = log
+        self.__constraint = (
+            dict(constraint) if constraint is not None else None
+        )
+        self.__output_dir = Path("log_history") / log
         self.__log = pd.read_csv('event_log/'+log+'.csv')
+
+        if self.__constraint is not None:
+            self.__output_dir = self.__output_dir / "constrained"
+        self.__output_dir.mkdir(parents=True, exist_ok=True)
+
         # ottengo un dataframe Pandas
         self.__train = []
         self.__test = []
@@ -37,6 +48,58 @@ class Log():
 
     def pad(self, iterable, size, padding=None):
         return islice(self.pad_infinite(iterable, padding), size)
+
+    #Questo metodo verifica una traccia completa per volta, e mantiene
+    # tutte le righe degli eventi appartenenti ai casi selezionati.
+    def __filter_training_cases(self):
+        template = self.__constraint["template"]
+
+        # Stessa normalizzazione usata nel preprocessing.
+        def normalize(activity):
+            for char in (" ", "+", "-", "_"):
+                activity = activity.replace(char, "")
+            return activity
+
+        activation = normalize(self.__constraint["activation"])
+        target = normalize(self.__constraint["target"])
+
+        vocabulary = self.__label2id["activity"]
+
+        for activity in (activation, target):
+            if activity == "ENDactivity" or activity not in vocabulary:
+                raise ValueError(f"Attività non valida: {activity}")
+
+        evaluator = EVALUATORS[template]
+
+        selected_cases = []
+        counts = {
+            "fulfilled": 0,
+            "violated": 0,
+            "vacuous": 0,
+        }
+
+        for case_id, group in self.__train.groupby("case", sort=False):
+            trace = group["activity"].tolist()
+
+            state = evaluator(trace, activation, target)
+            counts[state] += 1
+
+            # Mantieni solo i casi in cui il vincolo è attivato e rispettato.
+            if state == "fulfilled":
+                selected_cases.append(case_id)
+
+        print("Risultati del vincolo sul training:", counts)
+        print("Casi selezionati:", len(selected_cases))
+
+        if not selected_cases:
+            raise ValueError(
+                "Nessun caso di training soddisfa il vincolo "
+                "in modo non vacuo."
+            )
+
+        self.__train = self.__train[
+            self.__train["case"].isin(selected_cases)
+        ].copy()
 
 
     #prende ogni case del frame e li trasforma in più storie temporali,
@@ -211,7 +274,8 @@ class Log():
         #Prende il primo 66% delle tracce e le mette nel training set
         #Prende il restante 33% e lo mette nel test_set
 
-
+        if self.__constraint is not None:
+            self.__filter_training_cases()
 
         self.__history_train, self.__dict_label_train, self.__len_prefix_train, dict_suffix_train = self.__gen_prefix_history(self.__train)
         self.__history_test, self.__dict_label_test, self.__len_prefix_test, dict_suffix_test = self.__gen_prefix_history(self.__test)
@@ -254,12 +318,8 @@ class Log():
         #DEL DIZIONARIO VAI A PRENDERE SOLO LE ACTIVITY. QUINDI AVRAI UNA LISTA CON LA NEXT ACTIVITY PER OGNI PREFISSO
 
 
-        with open('log_history/'+self.__log_name+'/'+self.__log_name+'_id2label_' + self.__setting + '.pkl', 'wb') as f:
-            pickle.dump(self.__id2label, f)
-
-        with open('log_history/' + self.__log_name + '/' + self.__log_name + '_label2id_'+ self.__setting +'.pkl', 'wb') as f:
-            pickle.dump(self.__label2id, f)
-
+        self.__serialize_object(self.__id2label, "id2label")
+        self.__serialize_object(self.__label2id, "label2id")
 
     def __utility_function(self,list_seq,dict_event_label):
         for l, a, r, t in zip(list_seq, dict_event_label['activity'], dict_event_label['resource'],
@@ -268,9 +328,14 @@ class Log():
             print('-------------------------')
 
 
-    def __serialize_object(self, lista, type):
-        with open('log_history/'+self.__log_name+'/'+self.__log_name+'_'+type+'_'+self.__setting+'.pkl', 'wb') as f:
-            pickle.dump(lista, f)
+
+    def __serialize_object(self, obj, kind):
+        filename = (
+            f"{self.__log_name}_{kind}_{self.__setting}.pkl"
+        )
+
+        with (self.__output_dir / filename).open("wb") as f:
+            pickle.dump(obj, f)
 
     def get_id2label(self):
         return self.__id2label
