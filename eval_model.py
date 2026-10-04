@@ -1,240 +1,174 @@
-import sys
+import argparse
+from collections import Counter
+from datetime import datetime
+import json
+from pathlib import Path
+import pickle
+
 import numpy as np
 import torch
-import pickle
 from torch.utils.data import DataLoader
-from neural_network.HistoryDataset import CustomDataset
-from neural_network.llamp_multiout import BertMultiOutputClassificationHeads
-from jellyfish._jellyfish import damerau_levenshtein_distance
 from transformers import AutoModel, AutoTokenizer
-import json
+from jellyfish import damerau_levenshtein_distance
 from tqdm import tqdm
 
-def clean_sequence(sequence_str):
-    sequence_list = sequence_str.split()
-    end_id = str(label2id["activity"]["ENDactivity"])
+from constraints.extraction import EVALUATORS
+from neural_network.HistoryDataset import CustomDataset
+from neural_network.llamp_multiout import BertMultiOutputClassificationHeads
 
-    if end_id in sequence_list:
-        sequence_list = sequence_list[:sequence_list.index(end_id)]
+#permette di valutare i modelli di suffix_generation
+#Dato un test set, per ogni modello si valuta, la correttezza del
+# suffisso rispetto alla ground truth e la compliance rispetto
+# ai vincoli. 
 
-    return " ".join(sequence_list)
-        #rimuove tutti gli id corrispondenti ad end activity
+BASE_MODEL = 'prajjwal1/bert-medium'
 
-def remove_word(sentence, word):
-    words = sentence.split()
-    words = [w for w in words if w != word]
-    new_sentence = ' '.join(words)
-    return new_sentence
-    #rimuove l'ultimo ENDactivity
 
-def decode_suffix(activity_ids, id2label):
-    activities = []
+def read_pickle(path):
+    with path.open('rb') as file:
+        return pickle.load(file)
 
-    for activity_id in activity_ids:
-        activity = id2label["activity"][int(activity_id)]
 
-        if activity == "ENDactivity":
+def trim_suffix(ids, end_id):
+    result = []
+    for value in ids:
+        value = int(value)
+        if value == end_id:
             break
+        result.append(value)
+    return result
 
-        activities.append(activity)
 
-    return activities
+def normalize(activity):
+    for char in (' ', '+', '-', '_'):
+        activity = activity.replace(char, '')
+    return activity
+
+
+def constraint_metrics(counts):
+    total = sum(counts.values())
+    activated = counts['fulfilled'] + counts['violated']
+    return {
+        'fulfilled': counts['fulfilled'],
+        'violated': counts['violated'],
+        'vacuous': counts['vacuous'],
+        'satisfaction_rate': (counts['fulfilled'] + counts['vacuous']) / total,
+        'non_vacuous_support': counts['fulfilled'] / activated if activated else None,
+        'activation_rate': activated / total,
+    }
+
+
+def evaluate(args):
+    checkpoint = Path(args.checkpoint or f'models/{args.dataset}_all.pth')
+    if not checkpoint.is_file():
+        raise FileNotFoundError(checkpoint)
+    # Entrambi i modelli usano il test originale, mai un test filtrato.
+    folder = Path('log_history') / args.dataset
+    def load(kind):
+        return read_pickle(folder / f'{args.dataset}_{kind}_all.pkl')
+
+    texts = load('test')
+    labels = load('suffix_test')
+    prefixes = load('prefix_activities_test')
+    lengths = load('len_test')
+    id2label = load('id2label')['activity']
+    label2id = load('label2id')['activity']
+    if len(prefixes) != len(texts) or len(lengths) != len(texts):
+        raise ValueError('Prefissi attività e testi non allineati: rigenera il preprocessing.')
+    if any(len(p) != n for p, n in zip(prefixes, lengths)):
+        raise ValueError('Lunghezze dei prefissi non coerenti.')
+    if any(len(values) != len(texts) for values in labels.values()):
+        raise ValueError('Label e testi non allineati.')
+    if set(labels) != set(range(len(labels))):
+        raise ValueError('Posizioni dei suffissi non contigue.')
+    if not texts or (args.limit is not None and args.limit <= 0):
+        raise ValueError('Test vuoto o limite non positivo.')
+
+    evaluator = EVALUATORS[args.template]
+    activation, target = normalize(args.activation), normalize(args.target)
+    for activity in (activation, target):
+        if activity == 'ENDactivity' or activity not in label2id:
+            raise ValueError(f'Attività non valida: {activity}')
+    end_id = label2id['ENDactivity']
+    limit = min(args.limit or len(texts), len(texts))
+    if torch.cuda.is_available():
+        device = torch.device('cuda')
+    elif torch.backends.mps.is_available():
+        device = torch.device('mps')
+    else:
+        device = torch.device('cpu')
+
+    tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, truncation_side='left')
+    dataset = CustomDataset(texts[:limit], {p: v[:limit] for p, v in labels.items()}, tokenizer, 512)
+    loader = DataLoader(dataset, batch_size=1, shuffle=False)
+    bert = AutoModel.from_pretrained(BASE_MODEL)
+    model = BertMultiOutputClassificationHeads(bert, [len(id2label)] * len(labels))
+    model.load_state_dict(torch.load(checkpoint, map_location='cpu', weights_only=True))
+    model.to(device)
+    model.eval()
+
+    run = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+    output_dir = Path('outputs') / f'eval_{args.dataset}_{run}'
+    output_dir.mkdir(parents=True, exist_ok=False)
+    predicted_counts, actual_counts = Counter(), Counter()
+    dl_scores = []
+    with (output_dir / 'examples.jsonl').open('w', encoding='utf-8') as file, torch.no_grad():
+        for index, batch in enumerate(tqdm(loader, desc='Evaluation')):
+            outputs = model(batch['input_ids'].to(device), batch['attention_mask'].to(device))
+            raw_pred = [head.argmax(dim=1).item() for head in outputs]
+            pred_ids = trim_suffix(raw_pred, end_id)
+            true_ids = trim_suffix([batch['labels'][p].item() for p in range(len(outputs))], end_id)
+            predicted_suffix = [id2label[i] for i in pred_ids]
+            true_suffix = [id2label[i] for i in true_ids]
+            prefix = prefixes[index]
+
+            # Il vincolo si applica alla sequenza COMPLETA, senza END o padding.
+            predicted_state = evaluator(prefix + predicted_suffix, activation, target)
+            actual_state = evaluator(prefix + true_suffix, activation, target)
+            predicted_counts[predicted_state] += 1
+            actual_counts[actual_state] += 1
+
+            # Conserva la metrica originale: distanza sulle stringhe degli ID.
+            pred_string = ' '.join(map(str, pred_ids))
+            true_string = ' '.join(map(str, true_ids))
+            denominator = max(len(pred_string), len(true_string))
+            score = 1 - damerau_levenshtein_distance(pred_string, true_string) / denominator if denominator else 1.0
+            dl_scores.append(score)
+            record = {
+                'test_index': index, 'prefix_text': texts[index], 'prefix_activities': prefix,
+                'predicted_suffix': predicted_suffix, 'true_suffix': true_suffix,
+                'predicted_end': end_id in raw_pred,
+                'exact_match': predicted_suffix == true_suffix,
+                'constraint_predicted': predicted_state, 'constraint_real': actual_state,
+                'dl_score_original': score,
+            }
+            file.write(json.dumps(record, ensure_ascii=False) + '\n')
+            if index < 5:
+                tqdm.write(f'{index}: previsto={predicted_state}, reale={actual_state}, DL={score:.3f}')
+
+    summary = {
+        'dataset': args.dataset, 'checkpoint': str(checkpoint), 'examples': limit,
+        'constraint': {'template': args.template, 'activation': activation, 'target': target},
+        'dl_score_original': float(np.mean(dl_scores)),
+        'predicted': constraint_metrics(predicted_counts),
+        'real': constraint_metrics(actual_counts),
+    }
+    (output_dir / 'metrics.json').write_text(json.dumps(summary, indent=2))
+    print(json.dumps(summary, indent=2))
+    print('Risultati:', output_dir)
+    return summary
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('dataset')
+    parser.add_argument('--checkpoint')
+    parser.add_argument('--template', required=True, choices=list(EVALUATORS))
+    parser.add_argument('--activation', required=True)
+    parser.add_argument('--target', required=True)
+    parser.add_argument('--limit', type=int)
+    evaluate(parser.parse_args())
+
 
 if __name__ == '__main__':
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print('device-->', device)
-    csv_log = sys.argv[1]
-    TYPE = 'all'
-    with open('log_history/'+csv_log+'/'+csv_log+'_test_'+TYPE+'.pkl', 'rb') as f:
-        test = pickle.load(f)
-
-    with open('log_history/'+csv_log+'/'+csv_log+'_label_test_'+TYPE+'.pkl', 'rb') as f:
-        y_test = pickle.load(f)
-
-    with open('log_history/' + csv_log + '/' + csv_log + '_id2label_'+TYPE+'.pkl', 'rb') as f:
-        id2label = pickle.load(f)
-
-    with open('log_history/' + csv_log + '/' + csv_log + '_label2id_'+TYPE+'.pkl', 'rb') as f:
-        label2id = pickle.load(f)
-
-    with open('log_history/'+csv_log+'/'+csv_log+'_suffix_train_'+TYPE+'.pkl', 'rb') as f:
-        y_train_suffix = pickle.load(f)
-
-    with open('log_history/'+csv_log+'/'+csv_log+'_suffix_test_'+TYPE+'.pkl', 'rb') as f:
-        y_test_suffix = pickle.load(f)
-
-    tokenizer = AutoTokenizer.from_pretrained('prajjwal1/bert-medium', truncation_side='left')
-    model = AutoModel.from_pretrained('prajjwal1/bert-medium')
-    MAX_LEN = 512
-
-    test_dataset = CustomDataset(test, y_test_suffix, tokenizer, MAX_LEN)
-    test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
-    #nota che la batch size è pari ad uno
-    output_sizes = []
-
-    dict_pred = {}
-    dict_truth = {}
-    for i in range(len(y_train_suffix)):
-        output_sizes.append(len(id2label['activity']))
-
-    model = BertMultiOutputClassificationHeads(model, output_sizes)
-
-    # Load the state dictionary into the model
-    #model.load_state_dict(torch.load('models/'+csv_log+'_'+TYPE+'.pth'))
-    #model = model.to(device)
-    state_dict = torch.load(
-        f"models/{csv_log}_{TYPE}.pth",
-        map_location="cpu",
-        weights_only=True,
-    )
-    model.load_state_dict(state_dict)
-
-    model=model.to(device)
-
-    # Make sure to set the model in evaluation mode if you're not training it further
-    model.eval()
-    dict_pred = {}
-    dict_truth = {}
-
-    """
-    list_dl_distance =[] #viene calcolato uno score per ogni prefisso di test
-    file_dl = open('suffix_'+csv_log+'_'+TYPE+'.txt','w')
-    file_dl.write('pred,truth,dl_score\n')
-    with torch.no_grad():
-        for batch in test_loader:
-            input_ids = batch['input_ids'].to(device)
-            attention_mask = batch['attention_mask'].to(device) #forward
-            output = model(input_ids, attention_mask)
-            #lista di max_length tensori [1* num_activities]
-            #print(id2label['activity'])
-            l_pred = [] #suffisso predetto
-            l_true = [] #suffisso vero
-            for i in range(len(y_train_suffix)):
-                pred = output[i].argmax(dim=1).cpu().numpy()
-                #non serve fare softmax perchè è una funziona monotona
-                l_pred.append(str(pred[0]))
-                l_true.append(str(batch['labels'][i].item()))
-            seq_pred = ' '.join(l_pred)
-            seq_true = ' '.join(l_true)
-
-            seq_pred = clean_sequence(seq_pred)
-            seq_true = clean_sequence(seq_true)
-            seq_pred = remove_word(seq_pred, str(label2id['activity']['ENDactivity']))
-            seq_true = remove_word(seq_true, str(label2id['activity']['ENDactivity']))
-            if seq_pred == '' and seq_true == '':
-                seq_pred = 'end'
-                seq_true = 'end'
-            dl_distance = 1 - (damerau_levenshtein_distance(seq_pred, seq_true) / max(len(seq_pred), len(seq_true)))
-            #normalizza la distanza
-            #potrebbero esserci dei problemi sul fatto che la distanza viene passata sottoforma di stringa
-            
-            file_dl.write(seq_pred+','+seq_true+','+str(dl_distance)+'\n')
-            list_dl_distance.append(dl_distance)
-    print(f"DL--> {np.mean(list_dl_distance):.3f}")
-    """
-    # Se impostato, valuta soltanto i primi N prefissi.
-    # Senza secondo argomento, valuta tutto il test set.
-    limit = int(sys.argv[2]) if len(sys.argv) > 2 else len(test_dataset)
-
-    if limit <= 0:
-        raise ValueError("Il numero di esempi deve essere positivo.")
-
-    limit = min(limit, len(test_dataset))
-    list_dl_distance = []
-
-    # Usa nomi diversi per le prove parziali.
-    run_name = f"{csv_log}_{TYPE}"
-    if limit < len(test_dataset):
-        run_name += f"_first{limit}"
-
-    scores_path = f"outputs/suffix_{run_name}.txt"
-    examples_path = f"outputs/examples_{run_name}.jsonl"
-
-    def display_suffix(activities):
-        return " → ".join(activities) if activities else "(nessuna attività futura)"
-
-    with (
-        open(scores_path, "w", encoding="utf-8") as scores_file,
-        open(examples_path, "w", encoding="utf-8") as examples_file,
-        torch.no_grad(),
-    ):
-        scores_file.write("pred,truth,dl_score\n")
-
-        progress = tqdm(total=limit, desc="Evaluation")
-
-        for example_index, batch in enumerate(test_loader):
-            if example_index >= limit:
-                break
-
-            input_ids = batch["input_ids"].to(device)
-            attention_mask = batch["attention_mask"].to(device)
-
-            output = model(input_ids, attention_mask)
-
-            pred_ids = [
-                head.argmax(dim=1).item()
-                for head in output
-            ]
-            true_ids = [
-                batch["labels"][position].item()
-                for position in range(len(output))
-            ]
-
-            predicted_suffix = decode_suffix(pred_ids, id2label)
-            true_suffix = decode_suffix(true_ids, id2label)
-            prefix_text = batch["text"][0]
-
-            # Mantiene la metrica originale del repository,
-            # calcolata sulle stringhe degli ID.
-            seq_pred = clean_sequence(" ".join(map(str, pred_ids)))
-            seq_true = clean_sequence(" ".join(map(str, true_ids)))
-
-            if not seq_pred and not seq_true:
-                dl_score = 1.0
-            else:
-                dl_score = 1 - (
-                    damerau_levenshtein_distance(seq_pred, seq_true)
-                    / max(len(seq_pred), len(seq_true))
-                )
-
-            list_dl_distance.append(dl_score)
-            scores_file.write(f"{seq_pred},{seq_true},{dl_score}\n")
-
-            record = {
-                "test_index": example_index,
-                "prefix_text": prefix_text,
-                "predicted_suffix": predicted_suffix,
-                "true_suffix": true_suffix,
-                "predicted_end": (
-                    label2id["activity"]["ENDactivity"] in pred_ids
-                ),
-                "exact_match": predicted_suffix == true_suffix,
-                "dl_score_original": dl_score,
-            }
-
-            examples_file.write(
-                json.dumps(record, ensure_ascii=False) + "\n"
-            )
-
-            # Mostra a terminale i primi cinque esempi.
-            if example_index < 5:
-                tqdm.write(
-                    f"\nESEMPIO {example_index}\n"
-                    f"PREFISSO TESTUALE:\n{prefix_text}\n\n"
-                    f"SUFFISSO PREVISTO:\n"
-                    f"{display_suffix(predicted_suffix)}\n\n"
-                    f"SUFFISSO REALE:\n"
-                    f"{display_suffix(true_suffix)}\n\n"
-                    f"Corrispondenza esatta: {record['exact_match']}\n"
-                )
-
-            progress.update(1)
-
-        progress.close()
-
-    print(f"Prefissi valutati: {len(list_dl_distance)}")
-    if list_dl_distance:
-        print(f"DL originale: {np.mean(list_dl_distance):.3f}")
-
-    print(f"Score salvati in: {scores_path}")
-    print(f"Esempi leggibili salvati in: {examples_path}")
+    main()

@@ -106,6 +106,7 @@ class Log():
     #costruendo gli appositi suffissi
     def __gen_prefix_history(self, df):
             list_seq = []
+            prefix_activities = []
             # lista contenente i prefissi trasformati in testo
             list_len_prefix = []
             #lista contenente la lunghezza dei prefissi 
@@ -141,6 +142,7 @@ class Log():
                 for index, row in group_data.iterrows():
                     #iteriamo sugli eventi del case corrente
                     activity_list.append(row['activity'])
+                    prefix_activities.append(activity_list.copy())
                     for v in lg.log[self.__log_name]['event_attribute']:
                         value = row[v]
                         if isinstance(value, str):
@@ -184,7 +186,7 @@ class Log():
                         dict_event_label[v].extend(group_data[v].shift(-1).fillna('END'+v).tolist())
                     else:
                         dict_event_label[v].extend(group_data[v].shift(-1).fillna(0).tolist())
-            return list_seq, dict_event_label, list_len_prefix, dict_len_label
+            return list_seq, dict_event_label, list_len_prefix, dict_len_label, prefix_activities
 
 
 
@@ -277,8 +279,8 @@ class Log():
         if self.__constraint is not None:
             self.__filter_training_cases()
 
-        self.__history_train, self.__dict_label_train, self.__len_prefix_train, dict_suffix_train = self.__gen_prefix_history(self.__train)
-        self.__history_test, self.__dict_label_test, self.__len_prefix_test, dict_suffix_test = self.__gen_prefix_history(self.__test)
+        self.__history_train, self.__dict_label_train, self.__len_prefix_train, dict_suffix_train, prefix_train = self.__gen_prefix_history(self.__train)
+        self.__history_test, self.__dict_label_test, self.__len_prefix_test, dict_suffix_test, prefix_test = self.__gen_prefix_history(self.__test)
         #Sia per il training set che per il test set, ho 4 strutture dati finali
         #1. __history_train: una lista che contiene un elemento per ogni prefisso del template già convertito in testo
         #2. __dict_label_train: dizionario che associa ad ogni attributo una lista con il prossimo valore che assume ogni attributo nello step successivo ad un certo prefisso
@@ -305,6 +307,9 @@ class Log():
                 self.__dict_label_test[v] = torch.tensor(temp_list)
             else:
                 self.__dict_label_test[v] = torch.tensor(self.__dict_label_test[v]).view(-1, 1)
+
+        self.__serialize_object(prefix_train, 'prefix_activities_train')
+        self.__serialize_object(prefix_test, 'prefix_activities_test')
 
         self.__serialize_object(self.__history_train, 'train')
         self.__serialize_object(self.__history_test, 'test')
