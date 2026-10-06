@@ -5,6 +5,7 @@ import pickle
 import random
 from datetime import datetime
 from pathlib import Path
+from tqdm.auto import tqdm
 
 import numpy as np
 import torch
@@ -69,7 +70,7 @@ def train_fn(model, train_loader, optimizer, device, criterion, mode, top_k):
 
     total_loss = 0.0
     total_examples = 0
-    for batch in train_loader:
+    for batch in tqdm(train_loader, desc="Training", unit="batch"):
         input_ids = batch["input_ids"].to(device)
         attention_mask = batch["attention_mask"].to(device)
         optimizer.zero_grad()
@@ -98,7 +99,7 @@ def evaluate_fn(model, data_loader, criterion, device):
     total_examples = 0
 
     with torch.no_grad():
-        for batch in data_loader:
+        for batch in tqdm(data_loader, desc="Validation", unit="batch"):
             input_ids = batch["input_ids"].to(device)
             attention_mask = batch["attention_mask"].to(device)
             outputs = model(input_ids, attention_mask)
