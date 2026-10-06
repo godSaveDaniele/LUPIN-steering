@@ -21,11 +21,12 @@ class Log():
         self.__output_dir = Path("log_history") / log
         self.__log = pd.read_csv('event_log/'+log+'.csv')
 
+
         if self.__constraint is not None:
             self.__output_dir = self.__output_dir / "constrained"
         self.__output_dir.mkdir(parents=True, exist_ok=True)
 
-        # ottengo un dataframe Pandas
+
         self.__train = []
         self.__test = []
         self.__len_prefix_train = []
@@ -85,7 +86,7 @@ class Log():
             counts[state] += 1
 
             # Mantieni solo i casi in cui il vincolo è attivato e rispettato.
-            if state == "fulfilled":
+            if state == "fulfilled" or state=="vacuous":
                 selected_cases.append(case_id)
 
         print("Risultati del vincolo sul training:", counts)
