@@ -156,18 +156,6 @@ def evaluate_constraint(
         else np.nan
     )
 
-    # --------------------------------------------------------
-    # Non-vacuous support
-    #
-    # Consideriamo SOLO le trace in cui il constraint
-    # è stato attivato.
-    # --------------------------------------------------------
-
-    non_vacuous_support = (
-        n_fulfilled / n_activated
-        if n_activated > 0
-        else np.nan
-    )
 
     # --------------------------------------------------------
     # Violation rate sulle trace attivate
@@ -178,6 +166,46 @@ def evaluate_constraint(
         if n_activated > 0
         else np.nan
     )
+
+
+    # --------------------------------------------------------
+    # Non-vacuous compliance
+    #
+    # Consideriamo SOLO le trace in cui il constraint
+    # è stato attivato.
+    # --------------------------------------------------------
+
+    non_vacuous_compliance = (
+        n_fulfilled / n_activated
+        if n_activated > 0
+        else np.nan
+    )
+
+    # --------------------------------------------------------
+    # Compliance
+    #
+    # Consideriamo le trace in cui il constraint è soddisfatto (vacue + fulfilled) 
+    # sulle totali
+    # 
+    # --------------------------------------------------------
+
+    compliance = (
+        (n_fulfilled  + n_vacuous)/ n_total
+        if n_activated > 0
+        else np.nan
+    )
+
+
+    # --------------------------------------------------------
+    # Vacuity rate
+    # --------------------------------------------------------
+
+    vacuity_rate = (
+        n_vacuous / n_total
+        if n_total > 0
+        else np.nan
+    )
+
 
     # --------------------------------------------------------
     # Violation coverage
@@ -192,28 +220,8 @@ def evaluate_constraint(
         else np.nan
     )
 
-    # --------------------------------------------------------
-    # Vacuity rate
-    # --------------------------------------------------------
 
-    vacuity_rate = (
-        n_vacuous / n_total
-        if n_total > 0
-        else np.nan
-    )
 
-    # --------------------------------------------------------
-    # Support classico contando la vacuity come soddisfatta.
-    #
-    # Lo calcoliamo per confronto, ma NON lo useremo
-    # per selezionare i constraint.
-    # --------------------------------------------------------
-
-    support_with_vacuity = (
-        (n_fulfilled + n_vacuous) / n_total
-        if n_total > 0
-        else np.nan
-    )
 
     return {
         "template": template,
@@ -226,11 +234,11 @@ def evaluate_constraint(
         "n_violated": n_violated,
         "n_vacuous": n_vacuous,
         "activation_rate": activation_rate,
-        "non_vacuous_support":  non_vacuous_support,
+        "non_vacuous_compliance":  non_vacuous_compliance,
+        "compliance": compliance,
         "violation_rate":violation_rate,
         "violation_coverage": violation_coverage,
-        "vacuity_rate": vacuity_rate,
-        "support_with_vacuity": support_with_vacuity,
+        "vacuity_rate": vacuity_rate
     } #evaluation di un singolo vincolo rispetto a tutto il log
 
 
@@ -248,11 +256,11 @@ def main():
     ]
 
     # Filtri per selezionare vincoli interessanti
-    MIN_NON_VACUOUS_SUPPORT = 0.70
-    MAX_NON_VACUOUS_SUPPORT = 0.95
+    MIN_NON_VACUOUS_COMPLIANCE = 0.70
+    MAX_NON_VACUOUS_COMPLIANCE = 0.95
 
     MIN_ACTIVATION_RATE = 0.20
-    MIN_VIOLATION_COVERAGE = 0.05
+    MIN_VIOLATION_COVERAGE = 0.01
     MIN_ACTIVATED_CASES = 50
 
     # Bisogna calcolare:
@@ -264,7 +272,7 @@ def main():
     # n_activated= n_fulfilled + n_violated
 
     # activation_rate= n_activated/n_cases
-    # non_vacuous_support -> n_fulfilled/n_activated
+    # non_vacuous_compliance -> n_fulfilled/n_activated
     # violation_coverage -> n_violated/n_cases
 
     # File di output
@@ -333,13 +341,13 @@ def main():
 
     selected_df = constraints_df[
         (
-            constraints_df["non_vacuous_support"]
-            >= MIN_NON_VACUOUS_SUPPORT
+            constraints_df["non_vacuous_compliance"]
+            >= MIN_NON_VACUOUS_COMPLIANCE
         )
         &
         (
-            constraints_df["non_vacuous_support"]
-            <= MAX_NON_VACUOUS_SUPPORT
+            constraints_df["non_vacuous_compliance"]
+            <= MAX_NON_VACUOUS_COMPLIANCE
         )
         &
         (
@@ -361,11 +369,11 @@ def main():
 
     # ORDINAMENTO
     # 1. activation rate elevato
-    # 2. support elevato
+    # 2. compliance elevata
     # 3. molte violazioni osservabili
 
     selected_df = selected_df.sort_values(
-        [   "activation_rate", "non_vacuous_support", "violation_coverage", ],
+        [   "activation_rate", "non_vacuous_compliance", "violation_coverage", ],
         ascending=[ False, False, False]
     )
 
@@ -384,8 +392,9 @@ def main():
     print("=" * 80)
 
 
-    columns_to_show = [ "constraint", "non_vacuous_support", "violation_rate", "activation_rate", "violation_coverage",
-                    "vacuity_rate", "n_activated", "n_fulfilled", "n_violated", "n_vacuous"]
+    columns_to_show = [ "constraint","compliance","non_vacuous_compliance", "violation_rate", "activation_rate", "vacuity_rate",
+                     # "n_activated", "n_fulfilled", "n_violated", "n_vacuous"
+                     ]
 
 
     if len(selected_df) > 0:

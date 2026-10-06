@@ -1,4 +1,3 @@
-"""Eseguire dalla radice di LUPIN. Usa il Log con constraint opzionale."""
 import argparse
 import json
 import math
@@ -166,18 +165,18 @@ def fine_tune(args):
 
     if torch.cuda.is_available():
         device = torch.device("cuda")
-    elif torch.backends.mps.is_available():
-        device = torch.device("mps")
     else:
         device = torch.device("cpu")
 
-    # 1. Genera i dati filtrati usando la tua classe Log.
+    # Genera i dati filtrati usando la tua classe Log.
     constraint = {
         "template": args.template,
         "activation": args.activation,
         "target": args.target,
     }
     Log(args.dataset, "all", constraint=constraint)
+
+    #lettura dei file di pre-processing
     folder = Path("log_history") / args.dataset / "constrained"
     train = read_pickle(folder / f"{args.dataset}_train_all.pkl")
     y_train_suffix = read_pickle(folder / f"{args.dataset}_suffix_train_all.pkl")
@@ -188,18 +187,23 @@ def fine_tune(args):
     if original_mapping.exists() and read_pickle(original_mapping) != id2label:
         raise ValueError("Il mapping delle attività differisce da quello originale.")
 
-    # 2. Stessa preparazione di train_input/train_label usata in main.py.
-    if len(train) < 2:
-        raise ValueError("Servono almeno due esempi dopo il filtro.")
+
+ 
     train_input, val_input = train_test_split(
         train, test_size=VALIDATION_SIZE, random_state=SEED
     )
+
     train_label = {}
     val_label = {}
     for position in y_train_suffix:
         train_label[position], val_label[position] = train_test_split(
             y_train_suffix[position], test_size=VALIDATION_SIZE, random_state=SEED
-        )
+        ) #genera esattamente la stessa suddivisione
+
+    print(train_input[0])
+    for position in train_label:
+        print(train_label[position][0])
+        #controllo da cancellare
 
     tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, truncation_side="left")
     train_dataset = CustomDataset(train_input, train_label, tokenizer, MAX_LENGTH)
@@ -207,13 +211,15 @@ def fine_tune(args):
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=False)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
 
-    # 3. Ricostruisce LUPIN e carica i pesi del precedente fine-tuning.
+  
     bert = AutoModel.from_pretrained(BASE_MODEL)
     output_sizes = [len(id2label["activity"])] * len(y_train_suffix)
     model = BertMultiOutputClassificationHeads(bert, output_sizes)
     model.load_state_dict(torch.load(checkpoint, map_location="cpu", weights_only=True))
     freeze_model(model, args.mode, args.top_k)
     model.to(device)
+    
+    print('TRAINING START...')
 
     criterion = {}
     for position in y_train_suffix:
@@ -223,7 +229,7 @@ def fine_tune(args):
     # 0.01 è il default di AdamW, usato anche dal main originale.
     optimizer = torch.optim.AdamW(parameters, lr=args.learning_rate, weight_decay=0.01)
 
-    # 4. Ogni esecuzione ha una cartella automatica distinta.
+    # Ogni esecuzione ha una cartella automatica distinta.
     run_name = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     output_dir = Path("models") / args.dataset / "constrained" / f"{args.mode}_{run_name}"
     output_dir.mkdir(parents=True, exist_ok=False)
@@ -238,7 +244,7 @@ def fine_tune(args):
     print("Prefissi training/validation:", len(train_input), len(val_input))
     print("Checkpoint in:", output_dir)
 
-    # 5. Il ciclo delle epoche è gestito da train_llm, come in main.py.
+    # Il ciclo delle epoche è gestito da train_llm
     model = train_llm(
         model, train_loader, val_loader, optimizer, args.epochs,
         criterion, device, args.mode, args.top_k, output_dir,
@@ -247,7 +253,7 @@ def fine_tune(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Fine-tuning LUPIN su casi conformi a un vincolo.")
+    parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", required=True)
     parser.add_argument("--template", required=True, choices=list(EVALUATORS))
     parser.add_argument("--activation", required=True)

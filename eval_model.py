@@ -52,8 +52,8 @@ def constraint_metrics(counts):
         'fulfilled': counts['fulfilled'],
         'violated': counts['violated'],
         'vacuous': counts['vacuous'],
-        'satisfaction_rate': (counts['fulfilled'] + counts['vacuous']) / total,
-        'non_vacuous_support': counts['fulfilled'] / activated if activated else None,
+        'compliance': (counts['fulfilled'] + counts['vacuous']) / total,
+        'non_vacuous_compliance': counts['fulfilled'] / activated,
         'activation_rate': activated / total,
     }
 
@@ -62,7 +62,8 @@ def evaluate(args):
     checkpoint = Path(args.checkpoint or f'models/{args.dataset}_all.pth')
     if not checkpoint.is_file():
         raise FileNotFoundError(checkpoint)
-    # Entrambi i modelli usano il test originale, mai un test filtrato.
+    
+    # Entrambi i modelli usano il test originale , mai un test filtrato.
     folder = Path('log_history') / args.dataset
     def load(kind):
         return read_pickle(folder / f'{args.dataset}_{kind}_all.pkl')
@@ -70,19 +71,17 @@ def evaluate(args):
     texts = load('test')
     labels = load('suffix_test')
     prefixes = load('prefix_activities_test')
+    #per valutare la compliance è necessario saperen la lista di attività del prefisso e non solo il contenuto testuale
     lengths = load('len_test')
     id2label = load('id2label')['activity']
     label2id = load('label2id')['activity']
     if len(prefixes) != len(texts) or len(lengths) != len(texts):
-        raise ValueError('Prefissi attività e testi non allineati: rigenera il preprocessing.')
+        raise ValueError('Prefixes and texts not aligned')
     if any(len(p) != n for p, n in zip(prefixes, lengths)):
-        raise ValueError('Lunghezze dei prefissi non coerenti.')
+        raise ValueError('Prrefixes lenght not coherent')
     if any(len(values) != len(texts) for values in labels.values()):
-        raise ValueError('Label e testi non allineati.')
-    if set(labels) != set(range(len(labels))):
-        raise ValueError('Posizioni dei suffissi non contigue.')
-    if not texts or (args.limit is not None and args.limit <= 0):
-        raise ValueError('Test vuoto o limite non positivo.')
+        raise ValueError('Labels and texts not aligned.')
+  
 
     evaluator = EVALUATORS[args.template]
     activation, target = normalize(args.activation), normalize(args.target)
@@ -91,10 +90,9 @@ def evaluate(args):
             raise ValueError(f'Attività non valida: {activity}')
     end_id = label2id['ENDactivity']
     limit = min(args.limit or len(texts), len(texts))
+
     if torch.cuda.is_available():
         device = torch.device('cuda')
-    elif torch.backends.mps.is_available():
-        device = torch.device('mps')
     else:
         device = torch.device('cpu')
 
@@ -115,7 +113,7 @@ def evaluate(args):
     with (output_dir / 'examples.jsonl').open('w', encoding='utf-8') as file, torch.no_grad():
         for index, batch in enumerate(tqdm(loader, desc='Evaluation')):
             outputs = model(batch['input_ids'].to(device), batch['attention_mask'].to(device))
-            raw_pred = [head.argmax(dim=1).item() for head in outputs]
+            raw_pred = [head.argmax(dim=1).item() for head in outputs] #prendi il suffisso più probabile
             pred_ids = trim_suffix(raw_pred, end_id)
             true_ids = trim_suffix([batch['labels'][p].item() for p in range(len(outputs))], end_id)
             predicted_suffix = [id2label[i] for i in pred_ids]
@@ -135,11 +133,15 @@ def evaluate(args):
             score = 1 - damerau_levenshtein_distance(pred_string, true_string) / denominator if denominator else 1.0
             dl_scores.append(score)
             record = {
-                'test_index': index, 'prefix_text': texts[index], 'prefix_activities': prefix,
-                'predicted_suffix': predicted_suffix, 'true_suffix': true_suffix,
+                'test_index': index,
+                'prefix_text': texts[index], 
+                'prefix_activities': prefix,
+                'predicted_suffix': predicted_suffix, 
+                'true_suffix': true_suffix,
                 'predicted_end': end_id in raw_pred,
                 'exact_match': predicted_suffix == true_suffix,
-                'constraint_predicted': predicted_state, 'constraint_real': actual_state,
+                'constraint_predicted': predicted_state, 
+                'constraint_real': actual_state,
                 'dl_score_original': score,
             }
             file.write(json.dumps(record, ensure_ascii=False) + '\n')
@@ -147,7 +149,9 @@ def evaluate(args):
                 tqdm.write(f'{index}: previsto={predicted_state}, reale={actual_state}, DL={score:.3f}')
 
     summary = {
-        'dataset': args.dataset, 'checkpoint': str(checkpoint), 'examples': limit,
+        'dataset': args.dataset, 
+        'checkpoint': str(checkpoint), 
+        'examples': limit,
         'constraint': {'template': args.template, 'activation': activation, 'target': target},
         'dl_score_original': float(np.mean(dl_scores)),
         'predicted': constraint_metrics(predicted_counts),
