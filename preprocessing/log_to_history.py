@@ -50,6 +50,9 @@ class Log():
     def pad(self, iterable, size, padding=None):
         return islice(self.pad_infinite(iterable, padding), size)
 
+    def test_fun():
+        return ""
+
     #Questo metodo verifica una traccia completa per volta, e mantiene
     # tutte le righe degli eventi appartenenti ai casi selezionati.
     def __filter_training_cases(self):
