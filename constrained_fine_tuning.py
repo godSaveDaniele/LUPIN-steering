@@ -231,8 +231,8 @@ def fine_tune(args):
     optimizer = torch.optim.AdamW(parameters, lr=args.learning_rate, weight_decay=0.01)
 
     # Ogni esecuzione ha una cartella automatica distinta.
-    run_name = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-    output_dir = Path("models") / args.dataset / "constrained" / f"{args.mode}_{run_name}"
+    #run_name = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+    output_dir = Path("models") / args.dataset / "constrained"
     output_dir.mkdir(parents=True, exist_ok=False)
     config = dict(vars(args), checkpoint=str(checkpoint), seed=SEED,
                   max_length=MAX_LENGTH, validation_size=VALIDATION_SIZE,
