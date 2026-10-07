@@ -15,14 +15,18 @@ def check_weights(base, constrained):
     if base.keys() != constrained.keys():
         raise ValueError('Checkpoints must be the same parameters')
     for name in base:
+        print(name)
         a, b = base[name], constrained[name]
+        print ("SHAPE= ", a.shape)
+        #itera su tutti i tensori, ad esempio potrebbero essere due matrici dei pesi della testa
         if a.shape != b.shape or a.dtype != b.dtype:
             raise ValueError(f'Shape or dtype different for {name}.')
         if a.is_floating_point():
             if not torch.isfinite(a).all() or not torch.isfinite(b).all():
-                raise ValueError(f'Pesi non finiti in {name}.')
+                raise ValueError(f'Weights are not finite in {name}.')
         elif not torch.equal(a, b):
-            # Buffer interi/bool non sono una direzione continua da interpolare.
+            #il checkpoint è costituito anche da matrici non floating point,
+            # booleani/interi che quindi non costituiscono una direzine da sommare
             raise ValueError(f'Buffer non floating diverso: {name}.')
 
 
@@ -57,6 +61,7 @@ def evaluate_alphas(args):
     base = torch.load(args.base_checkpoint, map_location='cpu', weights_only=True)
     constrained = torch.load(args.constrained_checkpoint, map_location='cpu', weights_only=True)
     check_weights(base, constrained)
+    #sono due state_dict 
 
     run = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
     output_dir = Path('outputs') / f'steering_{args.dataset}_{run}'
@@ -117,7 +122,7 @@ def evaluate_alphas(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', required=True) 
     parser.add_argument('--base-checkpoint', required=True)
     parser.add_argument('--constrained-checkpoint', required=True)

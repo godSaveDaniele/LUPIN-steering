@@ -17,12 +17,12 @@ from constraints.extraction import EVALUATORS
 from preprocessing.log_to_history import Log
 from neural_network.HistoryDataset import CustomDataset
 from neural_network.llamp_multiout import BertMultiOutputClassificationHeads
+from utility import reproducibility
 
 # Valori fissi, come nel training originale.
 BASE_MODEL = "prajjwal1/bert-medium"
 MAX_LENGTH = 512
 VALIDATION_SIZE = 0.2
-SEED = 42
 
 
 def read_pickle(path):
@@ -49,12 +49,6 @@ def freeze_model(model, mode, top_k):
         for parameter in model.gpt_model.pooler.parameters():
             parameter.requires_grad = True
 
-
-def set_seed(seed):
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
 
 
 def train_fn(model, train_loader, optimizer, device, criterion, mode, top_k):
@@ -162,7 +156,8 @@ def fine_tune(args):
     if not checkpoint.is_file():
         raise FileNotFoundError(checkpoint)
 
-    set_seed(SEED)
+    reproducibility.SEED = args.seed
+    reproducibility.set_seed()
 
     if torch.cuda.is_available():
         device = torch.device("cuda")
@@ -191,14 +186,14 @@ def fine_tune(args):
 
  
     train_input, val_input = train_test_split(
-        train, test_size=VALIDATION_SIZE, random_state=SEED
+        train, test_size=VALIDATION_SIZE, random_state= reproducibility.SEED
     )
 
     train_label = {}
     val_label = {}
     for position in y_train_suffix:
         train_label[position], val_label[position] = train_test_split(
-            y_train_suffix[position], test_size=VALIDATION_SIZE, random_state=SEED
+            y_train_suffix[position], test_size=VALIDATION_SIZE, random_state= reproducibility.SEED
         ) #genera esattamente la stessa suddivisione
 
     print(train_input[0])
@@ -265,6 +260,7 @@ def main():
     parser.add_argument("--learning-rate", type=float, default=1e-5)
     parser.add_argument("--epochs", type=int, default=3)
     parser.add_argument("--batch-size", type=int, default=8)
+    parser.add_argument("--seed", type=int, default=reproducibility.SEED)
     best = fine_tune(parser.parse_args())
     print("Checkpoint migliore:", best)
 

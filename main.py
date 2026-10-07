@@ -5,6 +5,7 @@ from transformers import AutoModel, AutoTokenizer
 from neural_network.llamp_multiout import BertMultiOutputClassificationHeads
 from sklearn.model_selection import train_test_split
 from preprocessing.log_to_history import Log
+from utility import reproducibility
 import torch
 import random
 import numpy as np
@@ -17,9 +18,7 @@ def set_seed(seed):
     np.random.seed(seed)
     random.seed(seed)
 
-# Set a seed value
-seed = 42
-set_seed(seed)
+
 
 
 def train_fn(model, train_loader, optimizer, device, criterion):
@@ -79,7 +78,7 @@ def train_llm(model, train_data_loader, valid_data_loader, optimizer, EPOCHS, cr
 
 
 if __name__ == '__main__':
-
+    reproducibility.set_seed()
     MAX_LEN = 512  
     BATCH_SIZE = 8
     LEARNING_RATE = 1e-5
@@ -113,13 +112,13 @@ if __name__ == '__main__':
 
 
 
-    train_input, val_input = train_test_split(train, test_size=0.2, random_state=42)
+    train_input, val_input = train_test_split(train, test_size=0.2, random_state=reproducibility.SEED)
     train_label = {} 
     val_label = {}
     # equivalenti y_train_suffix ma splitate per training e validation
 
     for key in y_train_suffix.keys():
-        train_label[key], val_label[key] = train_test_split(y_train_suffix[key], test_size=0.2, random_state=42)
+        train_label[key], val_label[key] = train_test_split(y_train_suffix[key], test_size=0.2, random_state=reproducibility.SEED)
 
 
     tokenizer = AutoTokenizer.from_pretrained('prajjwal1/bert-medium', truncation_side='left')

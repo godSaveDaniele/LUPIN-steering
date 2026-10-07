@@ -15,6 +15,7 @@ from tqdm import tqdm
 from constraints.extraction import EVALUATORS
 from neural_network.HistoryDataset import CustomDataset
 from neural_network.llamp_multiout import BertMultiOutputClassificationHeads
+from utility import reproducibility
 
 #permette di valutare i modelli di suffix_generation
 #Dato un test set, per ogni modello si valuta, la correttezza del
@@ -59,6 +60,7 @@ def constraint_metrics(counts):
 
 
 def evaluate(args):
+    reproducibility.set_seed()
     checkpoint = Path(args.checkpoint or f'models/{args.dataset}_all.pth')
     if not checkpoint.is_file():
         raise FileNotFoundError(checkpoint)
