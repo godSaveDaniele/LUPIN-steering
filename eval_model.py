@@ -126,9 +126,11 @@ def evaluate(args):
             predicted_counts[predicted_state] += 1
             actual_counts[actual_state] += 1
 
-            # Conserva la metrica originale: distanza sulle stringhe degli ID.
-            pred_string = ' '.join(map(str, pred_ids))
-            true_string = ' '.join(map(str, true_ids))
+            
+            #pred_string = ' '.join(map(str, pred_ids))
+            #true_string = ' '.join(map(str, true_ids))
+            pred_string = "".join(chr(activity_id) for activity_id in pred_ids)
+            true_string = "".join(chr(activity_id) for activity_id in true_ids)
             denominator = max(len(pred_string), len(true_string))
             score = 1 - damerau_levenshtein_distance(pred_string, true_string) / denominator if denominator else 1.0
             dl_scores.append(score)

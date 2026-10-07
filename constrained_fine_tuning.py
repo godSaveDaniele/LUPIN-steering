@@ -141,7 +141,7 @@ def train_llm(model, train_loader, val_loader, optimizer, epochs,
             flush=True,
         )
 
-    # Restituisce il modello con i pesi della migliore epoca, come inteso in main.py.
+    # Restituisce il modello con i pesi della migliore epoca
     model.load_state_dict(
         torch.load(output_dir / "best.pth", map_location=device, weights_only=True)
     )

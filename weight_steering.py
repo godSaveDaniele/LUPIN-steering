@@ -1,6 +1,3 @@
-"""Valuta theta(alpha) = theta_base + alpha * (theta_constrained - theta_base).
-Riusa evaluate() di eval_model.py senza modificare le metriche o il test.
-"""
 import argparse
 import csv
 from datetime import datetime
@@ -16,11 +13,11 @@ from eval_model import evaluate
 
 def check_weights(base, constrained):
     if base.keys() != constrained.keys():
-        raise ValueError('I checkpoint non hanno gli stessi parametri.')
+        raise ValueError('Checkpoints must be the same parameters')
     for name in base:
         a, b = base[name], constrained[name]
         if a.shape != b.shape or a.dtype != b.dtype:
-            raise ValueError(f'Shape o dtype diversi per {name}.')
+            raise ValueError(f'Shape or dtype different for {name}.')
         if a.is_floating_point():
             if not torch.isfinite(a).all() or not torch.isfinite(b).all():
                 raise ValueError(f'Pesi non finiti in {name}.')
@@ -53,9 +50,10 @@ def interpolate(base, constrained, alpha):
     return weights
 
 
-def sweep(args):
+def evaluate_alphas(args):
     if not all(math.isfinite(alpha) for alpha in args.alphas):
         raise ValueError('Tutti gli alpha devono essere finiti.')
+    
     base = torch.load(args.base_checkpoint, map_location='cpu', weights_only=True)
     constrained = torch.load(args.constrained_checkpoint, map_location='cpu', weights_only=True)
     check_weights(base, constrained)
@@ -120,15 +118,15 @@ def sweep(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--dataset', required=True)
+    parser.add_argument('--dataset', required=True) 
     parser.add_argument('--base-checkpoint', required=True)
     parser.add_argument('--constrained-checkpoint', required=True)
     parser.add_argument('--template', required=True, choices=list(EVALUATORS))
     parser.add_argument('--activation', required=True)
     parser.add_argument('--target', required=True)
-    parser.add_argument('--alphas', nargs='+', type=float, default=[0, 0.25, 0.5, 0.75, 1])
+    parser.add_argument('--alphas', nargs='+', type=float, default=[0, 0.1, 0.2, 0.3, 0.75, 1])
     parser.add_argument('--limit', type=int)
-    sweep(parser.parse_args())
+    evaluate_alphas(parser.parse_args())
 
 
 if __name__ == '__main__':
