@@ -229,7 +229,7 @@ def fine_tune(args):
     #run_name = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     output_dir = Path("models") / args.dataset / "constrained"
     output_dir.mkdir(parents=True, exist_ok=False)
-    config = dict(vars(args), checkpoint=str(checkpoint), seed=SEED,
+    config = dict(vars(args), checkpoint=str(checkpoint), seed= reproducibility.SEED,
                   max_length=MAX_LENGTH, validation_size=VALIDATION_SIZE,
                   base_model=BASE_MODEL, weight_decay=0.01)
     (output_dir / "config.json").write_text(json.dumps(config, indent=2))
