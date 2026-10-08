@@ -253,7 +253,6 @@ class Log():
                 self.__label2id[c] = {l: k for k, l in enumerate(ALL_LABEL)}
                 #Gli output sono dizionari di dizionari. Il dizionario esterno ha per chiave i nomi degli attributi
                 # Mentre il dizionario interno associa a ciascun valore unico assunto dall'attributo un id numerico e viceversa
-     
 
     
 
