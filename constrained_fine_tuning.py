@@ -2,8 +2,6 @@ import argparse
 import json
 import math
 import pickle
-import random
-from datetime import datetime
 from pathlib import Path
 from tqdm.auto import tqdm
 
@@ -234,9 +232,8 @@ def fine_tune(args):
     # 0.01 è il default di AdamW, usato anche dal main originale.
     optimizer = torch.optim.AdamW(parameters, lr=args.learning_rate, weight_decay=0.01)
 
-    run_name = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-    output_dir = ( Path("models") / args.dataset / subset_name / f"{args.mode}_seed{args.seed}_{run_name}" )
-    output_dir.mkdir(parents=True, exist_ok=False)
+    output_dir = ( Path("models") / args.dataset / subset_name / f"{args.mode}_seed{args.seed}")
+    output_dir.mkdir(parents=True, exist_ok=True)
     config = dict(vars(args), checkpoint=str(checkpoint), seed= reproducibility.SEED,
                   max_length=MAX_LENGTH, validation_size=VALIDATION_SIZE,
                   base_model=BASE_MODEL, weight_decay=0.01)
