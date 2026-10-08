@@ -124,8 +124,8 @@ def evaluate_alphas(args):
                 'alpha': alpha,
                 'examples': summary['examples'],
                 'dl_score_original': summary['dl_score_original'],
-                'support': metrics['support'],
-                'non_vacuous_support': metrics['non_vacuous_support'],
+                'compliance': metrics['compliance'],
+                'non_vacuous_compliance': metrics['non_vacuous_compliance'],
                 'activation_rate': metrics['activation_rate'],
                 'fulfilled': metrics['fulfilled'],
                 'violated': metrics['violated'],
@@ -141,7 +141,7 @@ def evaluate_alphas(args):
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
 
-    print('\nRisultati dello sweep:', output_dir / 'results.csv')
+    print('\nResults in :', output_dir / 'results.csv')
     return output_dir
 
 
