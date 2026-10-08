@@ -6,6 +6,7 @@ import pickle
 import torch
 from itertools import chain, repeat, islice
 from pathlib import Path
+from utility import reproducibility
 from constraints.extraction import EVALUATORS
 
 # Prende un event log csv e lo trasforma nei dati che verranno passati a BERT.
@@ -13,17 +14,18 @@ from constraints.extraction import EVALUATORS
 # e serializza tutto in file.pkl
 
 class Log():
-    def __init__(self, log, setting, constraint=None):
+    def __init__(self, log, setting, constraint=None, random_subset=False):
         self.__log_name = log
         self.__constraint = (
             dict(constraint) if constraint is not None else None
         )
         self.__output_dir = Path("log_history") / log
         self.__log = pd.read_csv('event_log/'+log+'.csv')
-
+        self.__random_subset= random_subset
 
         if self.__constraint is not None:
-            self.__output_dir = self.__output_dir / "constrained"
+            subset_name = "random_subset" if random_subset else "constrained"
+            self.__output_dir = self.__output_dir / subset_name
         self.__output_dir.mkdir(parents=True, exist_ok=True)
 
 
@@ -87,22 +89,34 @@ class Log():
             state = evaluator(trace, activation, target)
             counts[state] += 1
 
-            # Mantieni solo i casi in cui il vincolo è attivato e rispettato.
+            # Mantieni tutti i casi in cui il vincolo è rispettato
             if state == "fulfilled" or state=="vacuous":
                 selected_cases.append(case_id)
-
         print("Risultati del vincolo sul training:", counts)
-        print("Casi selezionati:", len(selected_cases))
 
-        if not selected_cases:
-            raise ValueError(
-                "Nessun caso di training soddisfa il vincolo "
-                "in modo non vacuo."
-            )
+        n_cases = len(selected_cases)
+
+        if self.__random_subset:
+            # self.__train contiene ancora TUTTO il training originale.
+            all_cases = self.__train["case"].drop_duplicates()
+
+            selected_cases = all_cases.sample(
+                n=n_cases,
+                replace=False,
+                random_state=reproducibility.SEED,
+            ).tolist()
+
+            print("Subset casuale, seed:", reproducibility.SEED)
+        else:
+            print("Subset constrained")
 
         self.__train = self.__train[
             self.__train["case"].isin(selected_cases)
         ].copy()
+
+        print("Casi selezionati:", self.__train["case"].nunique())
+        print("Eventi selezionati:", len(self.__train))
+
 
 
     #prende ogni case del frame e li trasforma in più storie temporali,

@@ -6,11 +6,15 @@ from neural_network.llamp_multiout import BertMultiOutputClassificationHeads
 from sklearn.model_selection import train_test_split
 from preprocessing.log_to_history import Log
 from utility import reproducibility
+from pathlib import Path
+from datetime import datetime
+import argparse
+
 import torch
 import random
 import numpy as np
 import sys
-import time
+
 
 def set_seed(seed):
     torch.manual_seed(seed)
@@ -52,41 +56,85 @@ def evaluate_fn(model, data_loader, criterion, device):
             total_loss = total_loss.item()
     return total_loss / len(data_loader)
 
-def train_llm(model, train_data_loader, valid_data_loader, optimizer, EPOCHS, criterion):
-        best_valid_loss = float("inf")
-        early_stop_counter = 0
-        patience = 5
 
-        for epoch in range(EPOCHS):
-            train_loss = train_fn(model, train_data_loader, optimizer, device, criterion)
-            valid_loss = evaluate_fn(model, valid_data_loader, criterion, device)
+def train_llm(
+    model, train_data_loader, valid_data_loader,
+    optimizer, EPOCHS, criterion, output_dir
+):
+    best_valid_loss = float("inf")
+    early_stop_counter = 0
+    patience = 5
 
-            if valid_loss < best_valid_loss:
-                best_valid_loss = valid_loss
-                best_model = model ######
-                early_stop_counter = 0  # Reset early stopping counter
-            else:
-                early_stop_counter += 1
+    # Modello senza il wrapper: checkpoint compatibili con eval e steering.
+    model_to_save = (
+        model.module
+        if isinstance(model, torch.nn.DataParallel)
+        else model
+    )
 
-            print(f"Epoch {epoch + 1}/{EPOCHS} - Train Loss: {train_loss:.4f} - Val Loss: {valid_loss:.4f}")
-            if early_stop_counter >= patience:
-                print("Validation loss hasn't improved for", patience, "epochs. Early stopping...")
-                break
-        return best_model
+    for epoch in range(1, EPOCHS + 1):
+        train_loss = train_fn( model, train_data_loader, optimizer, device, criterion)
+
+        # Salva subito dopo il training, prima della validation.
+        torch.save( model_to_save.state_dict(), output_dir / f"epoch_{epoch:03d}.pth",
+        )
+
+        valid_loss = evaluate_fn( model, valid_data_loader, criterion, device)
+
+        if valid_loss < best_valid_loss:
+            best_valid_loss = valid_loss
+            early_stop_counter = 0
+
+            torch.save( model_to_save.state_dict(), output_dir / "best.pth" )
+        else:
+            early_stop_counter += 1
+
+
+        print(
+            f"Epoch {epoch}/{EPOCHS} | "
+            f"Train loss: {train_loss:.4f} | "
+            f"Val loss: {valid_loss:.4f}",
+            flush=True,
+        )
+
+        if early_stop_counter >= patience:
+            print("Early stopping.", flush=True)
+            break
+
+    # Ripristina effettivamente l'epoca migliore.
+    model_to_save.load_state_dict(
+        torch.load(
+            output_dir / "best.pth",
+            map_location=device,
+            weights_only=True,
+        )
+    )
+
+    return model_to_save
 
 
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("dataset")
+    parser.add_argument("--seed", type=int, default=reproducibility.SEED)
+    args = parser.parse_args()
+
+    reproducibility.SEED = args.seed
     reproducibility.set_seed()
+
+    csv_log = args.dataset
+    print("Seed:", reproducibility.SEED)
+
     MAX_LEN = 512  
-    BATCH_SIZE = 8
+    BATCH_SIZE = 16
     LEARNING_RATE = 1e-5
     EPOCHS = 50
     TYPE = 'all'
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print('device-->', device)
-    csv_log = sys.argv[1]
+
     Log(csv_log, TYPE)  #effettuare il pre-processing
 
     with open('log_history/'+csv_log+'/'+csv_log+'_id2label_'+TYPE+'.pkl', 'rb') as f:
@@ -140,6 +188,10 @@ if __name__ == '__main__':
     print('TRAINING START...')
     # Initialize model
     model = BertMultiOutputClassificationHeads(model, output_sizes).to(device)
+    if torch.cuda.device_count() > 1:
+        model = torch.nn.DataParallel(model)
+
+    print("GPU utilizzate:", torch.cuda.device_count())
     criterion = {}
 
     for l in y_train_suffix:
@@ -150,9 +202,11 @@ if __name__ == '__main__':
     optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE)
     #Il fine tuning avviene su tutti i parametri del modello, incluse le teste di classificazione
 
-    startTime = time.time()
-    bert_model = train_llm(model, train_loader, val_loader, optimizer, EPOCHS, criterion)
-    torch.save(bert_model.state_dict(), 'models/'+csv_log+'_'+TYPE+'.pth')
-    executionTime = (time.time() - startTime)
-    file_time = open(csv_log + '_'+TYPE+'.txt', 'w')
-    file_time.write(str(executionTime))
+    
+    output_dir = Path("models") / csv_log / f"seed_{reproducibility.SEED}"
+    output_dir.mkdir(parents=True, exist_ok=False)
+
+    print("Checkpoint salvati in:", output_dir, flush=True)
+
+
+    bert_model = train_llm( model, train_loader, val_loader, optimizer, EPOCHS, criterion, output_dir )

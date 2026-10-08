@@ -170,10 +170,19 @@ def fine_tune(args):
         "activation": args.activation,
         "target": args.target,
     }
-    Log(args.dataset, "all", constraint=constraint)
 
-    #lettura dei file di pre-processing
-    folder = Path("log_history") / args.dataset / "constrained"
+    subset_name = "random_subset" if args.random_subset else "constrained"
+
+    Log(
+        args.dataset,
+        "all",
+        constraint=constraint,
+        random_subset=args.random_subset,
+    )
+
+    folder = Path("log_history") / args.dataset / subset_name
+
+    
     train = read_pickle(folder / f"{args.dataset}_train_all.pkl")
     y_train_suffix = read_pickle(folder / f"{args.dataset}_suffix_train_all.pkl")
     id2label = read_pickle(folder / f"{args.dataset}_id2label_all.pkl")
@@ -225,9 +234,8 @@ def fine_tune(args):
     # 0.01 è il default di AdamW, usato anche dal main originale.
     optimizer = torch.optim.AdamW(parameters, lr=args.learning_rate, weight_decay=0.01)
 
-    # Ogni esecuzione ha una cartella automatica distinta.
-    #run_name = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-    output_dir = Path("models") / args.dataset / "constrained"
+    run_name = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+    output_dir = ( Path("models") / args.dataset / subset_name / f"{args.mode}_seed{args.seed}_{run_name}" )
     output_dir.mkdir(parents=True, exist_ok=False)
     config = dict(vars(args), checkpoint=str(checkpoint), seed= reproducibility.SEED,
                   max_length=MAX_LENGTH, validation_size=VALIDATION_SIZE,
@@ -261,6 +269,7 @@ def main():
     parser.add_argument("--epochs", type=int, default=3)
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--seed", type=int, default=reproducibility.SEED)
+    parser.add_argument("--random-subset", action="store_true", help="Usa casi casuali nello stesso numero del subset constrained.")
     best = fine_tune(parser.parse_args())
     print("Checkpoint migliore:", best)
 
