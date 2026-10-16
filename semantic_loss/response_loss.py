@@ -12,7 +12,7 @@ from torch.nn import functional as F
 
 
 class ResponseSoftLoss(nn.Module):
-    def __init__(self, activation_id, target_id, end_id, eps=1e-7):
+    def __init__(self, activation_id, target_id, end_id, eps=1e-7, verbose=False):
         super().__init__()
         if len({activation_id, target_id, end_id}) != 3:
             raise ValueError("A, B and END must correspond to distinct IDs")
@@ -22,6 +22,7 @@ class ResponseSoftLoss(nn.Module):
         self.target_id = target_id
         self.end_id = end_id
         self.eps = eps
+        self.verbose = verbose
 
 
     # Restituisce la loss media sul batch.
@@ -52,18 +53,16 @@ class ResponseSoftLoss(nn.Module):
         p = probabilities if probabilities.dtype == torch.float64 else probabilities.float()
 
 
-        print("="*20)
-        print("_"*20)
-        print("Prefissi")
-        print(prefix_ids)
-
-        print("-"*20)
-        print("Lunghezze")
-        print(prefix_lengths)
-
-        print("_"*20)
-        print ("Probabilità")
-        print(p)
+        if self.verbose:
+            print("="*20)
+            print("Prefissi")
+            print(prefix_ids)
+            print("-"*20)
+            print("Lunghezze")
+            print(prefix_lengths)
+            print("_"*20)
+            print ("Probabilità")
+            print(p)
 
         batch, horizon, vocabulary = p.shape
 
@@ -110,9 +109,10 @@ class ResponseSoftLoss(nn.Module):
         prefix = F.one_hot(safe_ids, num_classes=vocabulary).to(p.dtype)
         #Trasforma ciascuna attività in un vettore one_hot
         # [batch, max_prefix, num_activities]
-        print("-"*20)
-        print ("Prefissi trasformati in vettori one-hot")
-        print(prefix)
+        if self.verbose:
+            print("-"*20)
+            print ("Prefissi trasformati in vettori one-hot")
+            print(prefix)
 
         prefix = prefix * valid.unsqueeze(-1)
         #nella moltiplicazione True vale 1 e false vale 0.
@@ -125,9 +125,10 @@ class ResponseSoftLoss(nn.Module):
         # p [batch_size, num_teste, activites]
         # risultato [batch_size, max_prefix + num_teste, activities]
 
-        print("-"*20)
-        print ("Prefissi + suffissi")
-        print(full)
+        if self.verbose:
+            print("-"*20)
+            print ("Prefissi + suffissi")
+            print(full)
 
         # s_t: probabilità di non avere END nelle posizioni PRECEDENTI.
         no_end = 1 - full[..., self.end_id]
@@ -142,22 +143,25 @@ class ResponseSoftLoss(nn.Module):
         # negli istanti di tempo tra 1 e t-1. 
 
 
-        print("-"* 20)
-        print ("Sopravvivenze")
-        print(survival)
+        if self.verbose:
+            print("-"* 20)
+            print ("Sopravvivenze")
+            print(survival)
 
 
         mass_a = survival * full[..., self.activation_id]
         mass_b = survival * full[..., self.target_id]
         # shape [batch_size, max_prefix + num_teste]
 
-        print("-"* 20)
-        print ("MASSA A")
-        print(mass_a)
+        if self.verbose:
+            print("-"* 20)
+            print ("MASSA A")
+            print(mass_a)
 
-        print("-"* 20)
-        print ("MASSA B")
-        print(mass_b)
+        if self.verbose:
+            print("-"* 20)
+            print ("MASSA B")
+            print(mass_b)
 
 
         # OR delle B strettamente SUCCESSIVE a t (prodotto inverso esclusivo).
@@ -166,39 +170,44 @@ class ResponseSoftLoss(nn.Module):
         )
         #ogni elemento contiene il prodotto (1 - massa_B) dall'istante corrente fino alla fine
 
-        print("-"*20)
-        print ("Probabilità di non osservare B tra l'istante corrente e la fine")
-        print(prob_no_b_from_here)
+        if self.verbose:
+            print("-"*20)
+            print ("Probabilità di non osservare B tra l'istante corrente e la fine")
+            print(prob_no_b_from_here)
 
 
         no_b_after = torch.cat((prob_no_b_from_here[:, 1:], ones), dim=1)
         #si shifta tutti di uno
         prob_almeno_un_b_after = 1 - no_b_after
 
-        print("-"*20)
-        print("Probabilità di non osservare B a partire dall'istante successivo")
-        print(no_b_after)
+        if self.verbose:
+            print("-"*20)
+            print("Probabilità di non osservare B a partire dall'istante successivo")
+            print(no_b_after)
 
-        print("-"*20)
-        print("Probabilità di osservare almeno un B a partire dall'istante di tempo successivo")
-        print(prob_almeno_un_b_after)
+        if self.verbose:
+            print("-"*20)
+            print("Probabilità di osservare almeno un B a partire dall'istante di tempo successivo")
+            print(prob_almeno_un_b_after)
 
         implications = (1 - mass_a * (1 - prob_almeno_un_b_after)).clamp(0, 1)
         #per ogni prefisso, e per ogni istante di tempo, ho la probabilità che 
         # l'implicazione sia verificata
 
-        print("-"*20)
-        print("Probabilità che le implicazioni siano valide")
-        print(implications)
+        if self.verbose:
+            print("-"*20)
+            print("Probabilità che le implicazioni siano valide")
+            print(implications)
 
 
         score = implications.prod(dim=1)
         #calcolo lo score come prodottoria sui diversi istanti di tempo,
         #perchè l'implicazione deve essere sempre verificata
 
-        print("-"*20)
-        print("Score")
-        print(score)
+        if self.verbose:
+            print("-"*20)
+            print("Score")
+            print(score)
 
 
         # -log del prodotto = somma dei -log.
@@ -226,7 +235,7 @@ class ResponseSoftLoss(nn.Module):
 if __name__== '__main__':
 
     # Vocabolario minimo: A=0, B=1, C=2, END=3.
-    criterion = ResponseSoftLoss(activation_id=0, target_id=1, end_id=3)
+    criterion = ResponseSoftLoss(activation_id=0, target_id=1, end_id=3, verbose=True)
 
     examples = [
         ("A nel prefisso, B nel suffisso", [0], [1, 3, 3]),
