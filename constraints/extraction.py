@@ -256,11 +256,11 @@ def main():
     ]
 
     # Filtri per selezionare vincoli interessanti
-    MIN_NON_VACUOUS_COMPLIANCE = 0.70
+    MIN_NON_VACUOUS_COMPLIANCE = 0.4
     MAX_NON_VACUOUS_COMPLIANCE = 0.95
 
     MIN_ACTIVATION_RATE = 0.20
-    MIN_VIOLATION_COVERAGE = 0.01
+    MIN_VIOLATION_COVERAGE = 0.00
     MIN_ACTIVATED_CASES = 50
 
     # Bisogna calcolare:

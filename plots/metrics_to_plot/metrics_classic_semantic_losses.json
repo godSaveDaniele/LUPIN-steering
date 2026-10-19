@@ -1,0 +1,408 @@
+[
+  {
+    "dataset": "bpic2017_o",
+    "examples": 65916,
+    "constraint": {
+      "template": "Response",
+      "activation": "OReturned",
+      "target": "OAccepted"
+    },
+    "dl_score_original": 0.853744412080021,
+    "predicted": {
+      "fulfilled": 29450,
+      "violated": 9463,
+      "vacuous": 27003,
+      "compliance": 0.8564384974816434,
+      "non_vacuous_compliance": 0.7568164880631152,
+      "activation_rate": 0.590342253777535
+    },
+    "real": {
+      "fulfilled": 29630,
+      "violated": 10571,
+      "vacuous": 25715,
+      "compliance": 0.839629225074337,
+      "non_vacuous_compliance": 0.7370463421307928,
+      "activation_rate": 0.609882274409855
+    },
+    "alpha": 0.0,
+    "base_checkpoint": "/kaggle/input/datasets/danieleolivet/lupin-bpic2017-o/bpic2017_o_all.pth",
+    "constrained_checkpoint": "/kaggle/working/LUPIN/models/bpic2017_o/semantic_response/heads_only_seed42/best.pth"
+  },
+  {
+    "dataset": "bpic2017_o",
+    "examples": 65916,
+    "constraint": {
+      "template": "Response",
+      "activation": "OReturned",
+      "target": "OAccepted"
+    },
+    "dl_score_original": 0.854294354430892,
+    "predicted": {
+      "fulfilled": 29497,
+      "violated": 9364,
+      "vacuous": 27055,
+      "compliance": 0.8579404090054008,
+      "non_vacuous_compliance": 0.7590386248423869,
+      "activation_rate": 0.5895533709569756
+    },
+    "real": {
+      "fulfilled": 29630,
+      "violated": 10571,
+      "vacuous": 25715,
+      "compliance": 0.839629225074337,
+      "non_vacuous_compliance": 0.7370463421307928,
+      "activation_rate": 0.609882274409855
+    },
+    "alpha": 0.1,
+    "base_checkpoint": "/kaggle/input/datasets/danieleolivet/lupin-bpic2017-o/bpic2017_o_all.pth",
+    "constrained_checkpoint": "/kaggle/working/LUPIN/models/bpic2017_o/semantic_response/heads_only_seed42/best.pth"
+  },
+  {
+    "dataset": "bpic2017_o",
+    "examples": 65916,
+    "constraint": {
+      "template": "Response",
+      "activation": "OReturned",
+      "target": "OAccepted"
+    },
+    "dl_score_original": 0.8547279871351416,
+    "predicted": {
+      "fulfilled": 29548,
+      "violated": 9271,
+      "vacuous": 27097,
+      "compliance": 0.8593512955883246,
+      "non_vacuous_compliance": 0.7611736520775909,
+      "activation_rate": 0.588916196371139
+    },
+    "real": {
+      "fulfilled": 29630,
+      "violated": 10571,
+      "vacuous": 25715,
+      "compliance": 0.839629225074337,
+      "non_vacuous_compliance": 0.7370463421307928,
+      "activation_rate": 0.609882274409855
+    },
+    "alpha": 0.2,
+    "base_checkpoint": "/kaggle/input/datasets/danieleolivet/lupin-bpic2017-o/bpic2017_o_all.pth",
+    "constrained_checkpoint": "/kaggle/working/LUPIN/models/bpic2017_o/semantic_response/heads_only_seed42/best.pth"
+  },
+  {
+    "dataset": "bpic2017_o",
+    "examples": 65916,
+    "constraint": {
+      "template": "Response",
+      "activation": "OReturned",
+      "target": "OAccepted"
+    },
+    "dl_score_original": 0.8549403786637538,
+    "predicted": {
+      "fulfilled": 29598,
+      "violated": 9180,
+      "vacuous": 27138,
+      "compliance": 0.8607318405243036,
+      "non_vacuous_compliance": 0.7632678322760328,
+      "activation_rate": 0.5882941926087748
+    },
+    "real": {
+      "fulfilled": 29630,
+      "violated": 10571,
+      "vacuous": 25715,
+      "compliance": 0.839629225074337,
+      "non_vacuous_compliance": 0.7370463421307928,
+      "activation_rate": 0.609882274409855
+    },
+    "alpha": 0.3,
+    "base_checkpoint": "/kaggle/input/datasets/danieleolivet/lupin-bpic2017-o/bpic2017_o_all.pth",
+    "constrained_checkpoint": "/kaggle/working/LUPIN/models/bpic2017_o/semantic_response/heads_only_seed42/best.pth"
+  },
+  {
+    "dataset": "bpic2017_o",
+    "examples": 65916,
+    "constraint": {
+      "template": "Response",
+      "activation": "OReturned",
+      "target": "OAccepted"
+    },
+    "dl_score_original": 0.8551818476040214,
+    "predicted": {
+      "fulfilled": 29647,
+      "violated": 9088,
+      "vacuous": 27181,
+      "compliance": 0.862127556283755,
+      "non_vacuous_compliance": 0.7653801471537369,
+      "activation_rate": 0.587641847199466
+    },
+    "real": {
+      "fulfilled": 29630,
+      "violated": 10571,
+      "vacuous": 25715,
+      "compliance": 0.839629225074337,
+      "non_vacuous_compliance": 0.7370463421307928,
+      "activation_rate": 0.609882274409855
+    },
+    "alpha": 0.4,
+    "base_checkpoint": "/kaggle/input/datasets/danieleolivet/lupin-bpic2017-o/bpic2017_o_all.pth",
+    "constrained_checkpoint": "/kaggle/working/LUPIN/models/bpic2017_o/semantic_response/heads_only_seed42/best.pth"
+  },
+  {
+    "dataset": "bpic2017_o",
+    "examples": 65916,
+    "constraint": {
+      "template": "Response",
+      "activation": "OReturned",
+      "target": "OAccepted"
+    },
+    "dl_score_original": 0.8553550478386633,
+    "predicted": {
+      "fulfilled": 29716,
+      "violated": 8955,
+      "vacuous": 27245,
+      "compliance": 0.8641452758055708,
+      "non_vacuous_compliance": 0.7684311240981614,
+      "activation_rate": 0.586670914497239
+    },
+    "real": {
+      "fulfilled": 29630,
+      "violated": 10571,
+      "vacuous": 25715,
+      "compliance": 0.839629225074337,
+      "non_vacuous_compliance": 0.7370463421307928,
+      "activation_rate": 0.609882274409855
+    },
+    "alpha": 0.5,
+    "base_checkpoint": "/kaggle/input/datasets/danieleolivet/lupin-bpic2017-o/bpic2017_o_all.pth",
+    "constrained_checkpoint": "/kaggle/working/LUPIN/models/bpic2017_o/semantic_response/heads_only_seed42/best.pth"
+  },
+  {
+    "dataset": "bpic2017_o",
+    "examples": 65916,
+    "constraint": {
+      "template": "Response",
+      "activation": "OReturned",
+      "target": "OAccepted"
+    },
+    "dl_score_original": 0.8552147177215444,
+    "predicted": {
+      "fulfilled": 29785,
+      "violated": 8843,
+      "vacuous": 27288,
+      "compliance": 0.8658444080344682,
+      "non_vacuous_compliance": 0.7710727969348659,
+      "activation_rate": 0.58601856908793
+    },
+    "real": {
+      "fulfilled": 29630,
+      "violated": 10571,
+      "vacuous": 25715,
+      "compliance": 0.839629225074337,
+      "non_vacuous_compliance": 0.7370463421307928,
+      "activation_rate": 0.609882274409855
+    },
+    "alpha": 0.6,
+    "base_checkpoint": "/kaggle/input/datasets/danieleolivet/lupin-bpic2017-o/bpic2017_o_all.pth",
+    "constrained_checkpoint": "/kaggle/working/LUPIN/models/bpic2017_o/semantic_response/heads_only_seed42/best.pth"
+  },
+  {
+    "dataset": "bpic2017_o",
+    "examples": 65916,
+    "constraint": {
+      "template": "Response",
+      "activation": "OReturned",
+      "target": "OAccepted"
+    },
+    "dl_score_original": 0.8552716083095657,
+    "predicted": {
+      "fulfilled": 29880,
+      "violated": 8683,
+      "vacuous": 27353,
+      "compliance": 0.8682717397900358,
+      "non_vacuous_compliance": 0.7748359826776963,
+      "activation_rate": 0.5850324655622308
+    },
+    "real": {
+      "fulfilled": 29630,
+      "violated": 10571,
+      "vacuous": 25715,
+      "compliance": 0.839629225074337,
+      "non_vacuous_compliance": 0.7370463421307928,
+      "activation_rate": 0.609882274409855
+    },
+    "alpha": 0.7,
+    "base_checkpoint": "/kaggle/input/datasets/danieleolivet/lupin-bpic2017-o/bpic2017_o_all.pth",
+    "constrained_checkpoint": "/kaggle/working/LUPIN/models/bpic2017_o/semantic_response/heads_only_seed42/best.pth"
+  },
+  {
+    "dataset": "bpic2017_o",
+    "examples": 65916,
+    "constraint": {
+      "template": "Response",
+      "activation": "OReturned",
+      "target": "OAccepted"
+    },
+    "dl_score_original": 0.8551729979569959,
+    "predicted": {
+      "fulfilled": 29974,
+      "violated": 8540,
+      "vacuous": 27402,
+      "compliance": 0.8704411675465744,
+      "non_vacuous_compliance": 0.7782624500181752,
+      "activation_rate": 0.5842890952120882
+    },
+    "real": {
+      "fulfilled": 29630,
+      "violated": 10571,
+      "vacuous": 25715,
+      "compliance": 0.839629225074337,
+      "non_vacuous_compliance": 0.7370463421307928,
+      "activation_rate": 0.609882274409855
+    },
+    "alpha": 0.8,
+    "base_checkpoint": "/kaggle/input/datasets/danieleolivet/lupin-bpic2017-o/bpic2017_o_all.pth",
+    "constrained_checkpoint": "/kaggle/working/LUPIN/models/bpic2017_o/semantic_response/heads_only_seed42/best.pth"
+  },
+  {
+    "dataset": "bpic2017_o",
+    "examples": 65916,
+    "constraint": {
+      "template": "Response",
+      "activation": "OReturned",
+      "target": "OAccepted"
+    },
+    "dl_score_original": 0.8550351963104559,
+    "predicted": {
+      "fulfilled": 30075,
+      "violated": 8376,
+      "vacuous": 27465,
+      "compliance": 0.8729291825960314,
+      "non_vacuous_compliance": 0.7821643130217679,
+      "activation_rate": 0.5833333333333334
+    },
+    "real": {
+      "fulfilled": 29630,
+      "violated": 10571,
+      "vacuous": 25715,
+      "compliance": 0.839629225074337,
+      "non_vacuous_compliance": 0.7370463421307928,
+      "activation_rate": 0.609882274409855
+    },
+    "alpha": 0.9,
+    "base_checkpoint": "/kaggle/input/datasets/danieleolivet/lupin-bpic2017-o/bpic2017_o_all.pth",
+    "constrained_checkpoint": "/kaggle/working/LUPIN/models/bpic2017_o/semantic_response/heads_only_seed42/best.pth"
+  },
+  {
+    "dataset": "bpic2017_o",
+    "examples": 65916,
+    "constraint": {
+      "template": "Response",
+      "activation": "OReturned",
+      "target": "OAccepted"
+    },
+    "dl_score_original": 0.8549517567813582,
+    "predicted": {
+      "fulfilled": 30216,
+      "violated": 8165,
+      "vacuous": 27535,
+      "compliance": 0.8761302263486862,
+      "non_vacuous_compliance": 0.7872645319298611,
+      "activation_rate": 0.5822713756902724
+    },
+    "real": {
+      "fulfilled": 29630,
+      "violated": 10571,
+      "vacuous": 25715,
+      "compliance": 0.839629225074337,
+      "non_vacuous_compliance": 0.7370463421307928,
+      "activation_rate": 0.609882274409855
+    },
+    "alpha": 1.0,
+    "base_checkpoint": "/kaggle/input/datasets/danieleolivet/lupin-bpic2017-o/bpic2017_o_all.pth",
+    "constrained_checkpoint": "/kaggle/working/LUPIN/models/bpic2017_o/semantic_response/heads_only_seed42/best.pth"
+  },
+  {
+    "dataset": "bpic2017_o",
+    "examples": 65916,
+    "constraint": {
+      "template": "Response",
+      "activation": "OReturned",
+      "target": "OAccepted"
+    },
+    "dl_score_original": 0.854231142666424,
+    "predicted": {
+      "fulfilled": 30392,
+      "violated": 7925,
+      "vacuous": 27599,
+      "compliance": 0.8797712239820378,
+      "non_vacuous_compliance": 0.7931727431688285,
+      "activation_rate": 0.5813004429880454
+    },
+    "real": {
+      "fulfilled": 29630,
+      "violated": 10571,
+      "vacuous": 25715,
+      "compliance": 0.839629225074337,
+      "non_vacuous_compliance": 0.7370463421307928,
+      "activation_rate": 0.609882274409855
+    },
+    "alpha": 1.1,
+    "base_checkpoint": "/kaggle/input/datasets/danieleolivet/lupin-bpic2017-o/bpic2017_o_all.pth",
+    "constrained_checkpoint": "/kaggle/working/LUPIN/models/bpic2017_o/semantic_response/heads_only_seed42/best.pth"
+  },
+  {
+    "dataset": "bpic2017_o",
+    "examples": 65916,
+    "constraint": {
+      "template": "Response",
+      "activation": "OReturned",
+      "target": "OAccepted"
+    },
+    "dl_score_original": 0.853218490199648,
+    "predicted": {
+      "fulfilled": 30616,
+      "violated": 7579,
+      "vacuous": 27721,
+      "compliance": 0.8850203289034528,
+      "non_vacuous_compliance": 0.8015708862416546,
+      "activation_rate": 0.579449602524425
+    },
+    "real": {
+      "fulfilled": 29630,
+      "violated": 10571,
+      "vacuous": 25715,
+      "compliance": 0.839629225074337,
+      "non_vacuous_compliance": 0.7370463421307928,
+      "activation_rate": 0.609882274409855
+    },
+    "alpha": 1.2,
+    "base_checkpoint": "/kaggle/input/datasets/danieleolivet/lupin-bpic2017-o/bpic2017_o_all.pth",
+    "constrained_checkpoint": "/kaggle/working/LUPIN/models/bpic2017_o/semantic_response/heads_only_seed42/best.pth"
+  },
+  {
+    "dataset": "bpic2017_o",
+    "examples": 65916,
+    "constraint": {
+      "template": "Response",
+      "activation": "OReturned",
+      "target": "OAccepted"
+    },
+    "dl_score_original": 0.6271517284624876,
+    "predicted": {
+      "fulfilled": 33713,
+      "violated": 3490,
+      "vacuous": 28713,
+      "compliance": 0.9470538260816798,
+      "non_vacuous_compliance": 0.9061903609923931,
+      "activation_rate": 0.5644001456399054
+    },
+    "real": {
+      "fulfilled": 29630,
+      "violated": 10571,
+      "vacuous": 25715,
+      "compliance": 0.839629225074337,
+      "non_vacuous_compliance": 0.7370463421307928,
+      "activation_rate": 0.609882274409855
+    },
+    "alpha": 1.5,
+    "base_checkpoint": "/kaggle/input/datasets/danieleolivet/lupin-bpic2017-o/bpic2017_o_all.pth",
+    "constrained_checkpoint": "/kaggle/working/LUPIN/models/bpic2017_o/semantic_response/heads_only_seed42/best.pth"
+  }
+]
