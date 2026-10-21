@@ -65,14 +65,14 @@ def delta_logits(pooled, weights, biases):
     return torch.einsum('bh,tah->bta', pooled.double(), weights) + biases.unsqueeze(0)
 
 
-def save_matrices(output_dir, means, counts, activities):
+def save_matrices(output_dir, means, counts, activities, kind='delta'):
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     from matplotlib.colors import LinearSegmentedColormap
 
     for group, matrix in means.items():
-        with (output_dir / f'{group}_mean_delta_logits.csv').open('w', newline='') as file:
+        with (output_dir / f'{group}_mean_{kind}_logits.csv').open('w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(['future_position'] + activities)
             for t, row in enumerate(matrix, start=1):
@@ -97,10 +97,13 @@ def save_matrices(output_dir, means, counts, activities):
             for (t, a), value in np.ndenumerate(matrix):
                 ax.text(a, t, f'{value:+.2f}', ha='center', va='center', fontsize=8)
     axes[0].set_ylabel('Posizione futura / testa')
-    fig.suptitle('Variazione media dei logits: ΔW h + Δb (nessuna softmax)')
-    fig.colorbar(im, ax=list(axes), label='Δ logit — scala comune centrata su zero', shrink=.75)
-    fig.savefig(output_dir / 'mean_delta_logits.png', dpi=180)
-    fig.savefig(output_dir / 'mean_delta_logits.pdf')
+    title = ('Logits medi del modello base: W h + b (nessuna softmax)'
+             if kind == 'base' else 'Variazione media dei logits: ΔW h + Δb (nessuna softmax)')
+    fig.suptitle(title)
+    label = 'Logit base' if kind == 'base' else 'Δ logit'
+    fig.colorbar(im, ax=list(axes), label=f'{label} — scala comune ai tre gruppi', shrink=.75)
+    fig.savefig(output_dir / f'mean_{kind}_logits.png', dpi=180)
+    fig.savefig(output_dir / f'mean_{kind}_logits.pdf')
     plt.close(fig)
 
 
@@ -135,6 +138,8 @@ def interpret_direction(args):
     dw, db = head_directions(base, destination, positions)
     if dw.shape[1] != len(id2label):
         raise ValueError('Vocabolario non coerente con i checkpoint.')
+    base_weights = torch.stack([base[f'output_layers.{t}.weight'].double() for t in range(positions)])
+    base_biases = torch.stack([base[f'output_layers.{t}.bias'].double() for t in range(positions)])
     activities = [id2label[i] for i in range(len(id2label))]
     groups = [prefix_group(p, activation, target) for p in prefixes]
     counts = {g: groups.count(g) for g in GROUPS}
@@ -146,21 +151,29 @@ def interpret_direction(args):
     model.to(device).eval()
     # Calcolo piccoli delta e somme su CPU double; BERT eseguito sulla GPU se disponibile.
     sums = {g: torch.zeros_like(db) for g in GROUPS}
+    base_sums = {g: torch.zeros_like(db) for g in GROUPS}
     offset = 0
     with torch.no_grad():
         for batch in tqdm(loader, desc='Pooled vector e delta logits'):
             pooled = model.gpt_model(input_ids=batch['input_ids'].to(device),
                                      attention_mask=batch['attention_mask'].to(device)).pooler_output.cpu()
             delta = delta_logits(pooled, dw, db)
+            # Stesso pooled vector, ma pesi originali: logits PRIMA del fine-tuning.
+            base_logits = delta_logits(pooled, base_weights, base_biases)
+            if not torch.isfinite(base_logits).all():
+                raise ValueError("Logits del modello base non finiti.")
             if not torch.isfinite(delta).all():
                 raise ValueError('Delta logits non finiti.')
             batch_groups = groups[offset:offset + len(pooled)]
             for group in GROUPS:
                 mask = torch.tensor([g == group for g in batch_groups], dtype=torch.bool)
                 sums[group] += delta[mask].sum(dim=0)
+                base_sums[group] += base_logits[mask].sum(dim=0)
             offset += len(pooled)
     means = {g: (sums[g] / counts[g]).numpy() if counts[g]
              else np.full(tuple(db.shape), np.nan) for g in GROUPS}
+    base_means = {g: (base_sums[g] / counts[g]).numpy() if counts[g]
+                  else np.full(tuple(db.shape), np.nan) for g in GROUPS}
     run = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
     output_dir = Path('outputs') / f'interpret_direction_{args.dataset}_{run}'
     output_dir.mkdir(parents=True)
@@ -174,6 +187,7 @@ def interpret_direction(args):
         writer.writerow(['test_index', 'prefix_length', 'group'])
         writer.writerows((i, len(p), g) for i, (p, g) in enumerate(zip(prefixes, groups)))
     save_matrices(output_dir, means, counts, activities)
+    save_matrices(output_dir, base_means, counts, activities, kind="base")
     print('Prefissi per gruppo:', counts)
     print('Risultati:', output_dir)
     return output_dir
