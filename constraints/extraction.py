@@ -169,17 +169,20 @@ def evaluate_constraint(
 
 
     # --------------------------------------------------------
-    # Non-vacuous compliance
+    # Confidence
     #
     # Consideriamo SOLO le trace in cui il constraint
     # è stato attivato.
     # --------------------------------------------------------
 
-    non_vacuous_compliance = (
+    confidence = (
         n_fulfilled / n_activated
         if n_activated > 0
         else np.nan
     )
+
+    # Non-vacuous compliance (support): fulfilled sul totale delle tracce.
+    support = n_fulfilled / n_total if n_total > 0 else np.nan
 
     # --------------------------------------------------------
     # Compliance
@@ -234,7 +237,8 @@ def evaluate_constraint(
         "n_violated": n_violated,
         "n_vacuous": n_vacuous,
         "activation_rate": activation_rate,
-        "non_vacuous_compliance":  non_vacuous_compliance,
+        "confidence":  confidence,
+        "non-vacuous compliance(support)": support,
         "compliance": compliance,
         "violation_rate":violation_rate,
         "violation_coverage": violation_coverage,
@@ -251,13 +255,13 @@ def main():
     # Template DECLARE da analizzare
     TEMPLATES = [
         "Response", #se avviene A, B deve avvenire successivamente 
-        "Precedence", #B può avvenire solo se A è avvenuto prima
-        "Chain Response", #se avviene A l'elemento immediatamente successivo è B
+      #  "Precedence", #B può avvenire solo se A è avvenuto prima
+      #  "Chain Response", #se avviene A l'elemento immediatamente successivo è B
     ]
 
     # Filtri per selezionare vincoli interessanti
-    MIN_NON_VACUOUS_COMPLIANCE = 0.4
-    MAX_NON_VACUOUS_COMPLIANCE = 0.95
+    MIN_CONFIDENCE = 0.4
+    MAX_CONFIDENCE = 1.0
 
     MIN_ACTIVATION_RATE = 0.20
     MIN_VIOLATION_COVERAGE = 0.00
@@ -272,7 +276,7 @@ def main():
     # n_activated= n_fulfilled + n_violated
 
     # activation_rate= n_activated/n_cases
-    # non_vacuous_compliance -> n_fulfilled/n_activated
+    # confidence -> n_fulfilled/n_activated
     # violation_coverage -> n_violated/n_cases
 
     # File di output
@@ -341,13 +345,13 @@ def main():
 
     selected_df = constraints_df[
         (
-            constraints_df["non_vacuous_compliance"]
-            >= MIN_NON_VACUOUS_COMPLIANCE
+            constraints_df["confidence"]
+            >= MIN_CONFIDENCE
         )
         &
         (
-            constraints_df["non_vacuous_compliance"]
-            <= MAX_NON_VACUOUS_COMPLIANCE
+            constraints_df["confidence"]
+            <= MAX_CONFIDENCE
         )
         &
         (
@@ -373,7 +377,7 @@ def main():
     # 3. molte violazioni osservabili
 
     selected_df = selected_df.sort_values(
-        [   "activation_rate", "non_vacuous_compliance", "violation_coverage", ],
+        [   "compliance", "non-vacuous compliance(support)", "violation_coverage", ],
         ascending=[ False, False, False]
     )
 
@@ -392,7 +396,7 @@ def main():
     print("=" * 80)
 
 
-    columns_to_show = [ "constraint","compliance","non_vacuous_compliance", "violation_rate", "activation_rate", "vacuity_rate",
+    columns_to_show = [ "constraint","compliance","confidence", "non-vacuous compliance(support)", "violation_rate", "activation_rate", "vacuity_rate",
                      # "n_activated", "n_fulfilled", "n_violated", "n_vacuous"
                      ]
 
