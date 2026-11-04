@@ -8,6 +8,7 @@ from itertools import chain, repeat, islice
 from pathlib import Path
 from utility import reproducibility
 from constraints.extraction import EVALUATORS
+from preprocessing.logistics_narrative import describe_event, ObjectAliases
 
 # Prende un event log csv e lo trasforma nei dati che verranno passati a BERT.
 # Genera i prefissi delle tracce, le label, divide in train e test set
@@ -156,6 +157,8 @@ class Log():
                 event_text = ''
                 len_prefix = 1
                 activity_list = []
+                # Ogni caso riparte da O1, D1, C1, H1, T1, V1, F1.
+                aliases = ObjectAliases() if self.__log_name == 'logistics' else None
                 for index, row in group_data.iterrows():
                     #iteriamo sugli eventi del case corrente
                     activity_list.append(row['activity'])
@@ -167,6 +170,11 @@ class Log():
                         else:
                             event_dict_hist[v] = value
                             #Questo dizionario rappresenta un singolo evento. Per ogni attributo prendo il suo valore
+                    # La descrizione viene costruita qui, senza rimuoverne gli spazi.
+                    if self.__log_name == 'logistics':
+                        event_dict_hist['event_description'] = describe_event(
+                            row['activity'], aliases.encode(row['event_objects'])
+                        )
                     event_text = event_text + event_template.render(event_dict_hist) + ' '
                     #Di volta in volta incremento questa stringa con il template relativo all'evento i-esimo
                     for w in lg.log[self.__log_name]['trace_attribute']:

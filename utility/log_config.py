@@ -1,4 +1,11 @@
 log = {
+        'logistics': {
+            'event_attribute': ['activity'],
+            'trace_attribute': [],
+            'event_template': '{{event_description}}',
+            'trace_template': '',
+            'target': 'activity',
+        },
         'helpdesk': {'event_attribute': ['activity', 'resource', 'timesincecasestart','servicelevel','servicetype','workgroup','product','customer'], 'trace_attribute': ['supportsection','responsiblesection'],
                      'event_template': '{{resource}} performed {{activity}} {{timesincecasestart}} seconds ago from the beginning of the trace. {{workgroup}} managed the request for the {{product}} of {{customer}} with service {{servicetype}} of level {{servicelevel}}.',
                      'trace_template': 'Section {{supportsection}} led by {{responsiblesection}}', 'target':'activity'},
