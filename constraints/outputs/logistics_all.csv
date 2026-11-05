@@ -1,0 +1,183 @@
+template,activation,target,constraint,n_cases,n_activated,n_fulfilled,n_violated,n_vacuous,activation_rate,confidence,non-vacuous compliance(support),compliance,violation_rate,violation_coverage,vacuity_rate
+Chain Response,Book Vehicles,Bring to Loading Bay,"Chain Response[Book Vehicles,Bring to Loading Bay]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Book Vehicles,Collect Goods,"Chain Response[Book Vehicles,Collect Goods]",600,594,61,533,6,0.99,0.1026936026936027,0.10166666666666667,0.11166666666666666,0.8973063973063973,0.8883333333333333,0.01
+Chain Response,Book Vehicles,Create Transport Document,"Chain Response[Book Vehicles,Create Transport Document]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Book Vehicles,Depart,"Chain Response[Book Vehicles,Depart]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Book Vehicles,Drive to Terminal,"Chain Response[Book Vehicles,Drive to Terminal]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Book Vehicles,Load Truck,"Chain Response[Book Vehicles,Load Truck]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Book Vehicles,Load to Vehicle,"Chain Response[Book Vehicles,Load to Vehicle]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Book Vehicles,Order Empty Containers,"Chain Response[Book Vehicles,Order Empty Containers]",600,594,532,62,6,0.99,0.8956228956228957,0.8866666666666667,0.8966666666666666,0.10437710437710437,0.10333333333333333,0.01
+Chain Response,Book Vehicles,Pick Up Empty Container,"Chain Response[Book Vehicles,Pick Up Empty Container]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Book Vehicles,Place in Stock,"Chain Response[Book Vehicles,Place in Stock]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Book Vehicles,Register Customer Order,"Chain Response[Book Vehicles,Register Customer Order]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Book Vehicles,Reschedule Container,"Chain Response[Book Vehicles,Reschedule Container]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Book Vehicles,Weigh,"Chain Response[Book Vehicles,Weigh]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Bring to Loading Bay,Book Vehicles,"Chain Response[Bring to Loading Bay,Book Vehicles]",600,579,0,579,21,0.965,0.0,0.0,0.035,1.0,0.965,0.035
+Chain Response,Bring to Loading Bay,Collect Goods,"Chain Response[Bring to Loading Bay,Collect Goods]",600,579,0,579,21,0.965,0.0,0.0,0.035,1.0,0.965,0.035
+Chain Response,Bring to Loading Bay,Create Transport Document,"Chain Response[Bring to Loading Bay,Create Transport Document]",600,579,0,579,21,0.965,0.0,0.0,0.035,1.0,0.965,0.035
+Chain Response,Bring to Loading Bay,Depart,"Chain Response[Bring to Loading Bay,Depart]",600,579,0,579,21,0.965,0.0,0.0,0.035,1.0,0.965,0.035
+Chain Response,Bring to Loading Bay,Drive to Terminal,"Chain Response[Bring to Loading Bay,Drive to Terminal]",600,579,0,579,21,0.965,0.0,0.0,0.035,1.0,0.965,0.035
+Chain Response,Bring to Loading Bay,Load Truck,"Chain Response[Bring to Loading Bay,Load Truck]",600,579,0,579,21,0.965,0.0,0.0,0.035,1.0,0.965,0.035
+Chain Response,Bring to Loading Bay,Load to Vehicle,"Chain Response[Bring to Loading Bay,Load to Vehicle]",600,579,274,305,21,0.965,0.47322970639032813,0.45666666666666667,0.49166666666666664,0.5267702936096719,0.5083333333333333,0.035
+Chain Response,Bring to Loading Bay,Order Empty Containers,"Chain Response[Bring to Loading Bay,Order Empty Containers]",600,579,0,579,21,0.965,0.0,0.0,0.035,1.0,0.965,0.035
+Chain Response,Bring to Loading Bay,Pick Up Empty Container,"Chain Response[Bring to Loading Bay,Pick Up Empty Container]",600,579,0,579,21,0.965,0.0,0.0,0.035,1.0,0.965,0.035
+Chain Response,Bring to Loading Bay,Place in Stock,"Chain Response[Bring to Loading Bay,Place in Stock]",600,579,0,579,21,0.965,0.0,0.0,0.035,1.0,0.965,0.035
+Chain Response,Bring to Loading Bay,Register Customer Order,"Chain Response[Bring to Loading Bay,Register Customer Order]",600,579,0,579,21,0.965,0.0,0.0,0.035,1.0,0.965,0.035
+Chain Response,Bring to Loading Bay,Reschedule Container,"Chain Response[Bring to Loading Bay,Reschedule Container]",600,579,1,578,21,0.965,0.0017271157167530224,0.0016666666666666668,0.03666666666666667,0.998272884283247,0.9633333333333334,0.035
+Chain Response,Bring to Loading Bay,Weigh,"Chain Response[Bring to Loading Bay,Weigh]",600,579,0,579,21,0.965,0.0,0.0,0.035,1.0,0.965,0.035
+Chain Response,Collect Goods,Book Vehicles,"Chain Response[Collect Goods,Book Vehicles]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Collect Goods,Bring to Loading Bay,"Chain Response[Collect Goods,Bring to Loading Bay]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Collect Goods,Create Transport Document,"Chain Response[Collect Goods,Create Transport Document]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Collect Goods,Depart,"Chain Response[Collect Goods,Depart]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Collect Goods,Drive to Terminal,"Chain Response[Collect Goods,Drive to Terminal]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Collect Goods,Load Truck,"Chain Response[Collect Goods,Load Truck]",600,588,11,577,12,0.98,0.01870748299319728,0.018333333333333333,0.03833333333333333,0.9812925170068028,0.9616666666666667,0.02
+Chain Response,Collect Goods,Load to Vehicle,"Chain Response[Collect Goods,Load to Vehicle]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Collect Goods,Order Empty Containers,"Chain Response[Collect Goods,Order Empty Containers]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Collect Goods,Pick Up Empty Container,"Chain Response[Collect Goods,Pick Up Empty Container]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Collect Goods,Place in Stock,"Chain Response[Collect Goods,Place in Stock]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Collect Goods,Register Customer Order,"Chain Response[Collect Goods,Register Customer Order]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Collect Goods,Reschedule Container,"Chain Response[Collect Goods,Reschedule Container]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Collect Goods,Weigh,"Chain Response[Collect Goods,Weigh]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Create Transport Document,Book Vehicles,"Chain Response[Create Transport Document,Book Vehicles]",600,594,594,0,6,0.99,1.0,0.99,1.0,0.0,0.0,0.01
+Chain Response,Create Transport Document,Bring to Loading Bay,"Chain Response[Create Transport Document,Bring to Loading Bay]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Create Transport Document,Collect Goods,"Chain Response[Create Transport Document,Collect Goods]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Create Transport Document,Depart,"Chain Response[Create Transport Document,Depart]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Create Transport Document,Drive to Terminal,"Chain Response[Create Transport Document,Drive to Terminal]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Create Transport Document,Load Truck,"Chain Response[Create Transport Document,Load Truck]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Create Transport Document,Load to Vehicle,"Chain Response[Create Transport Document,Load to Vehicle]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Create Transport Document,Order Empty Containers,"Chain Response[Create Transport Document,Order Empty Containers]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Create Transport Document,Pick Up Empty Container,"Chain Response[Create Transport Document,Pick Up Empty Container]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Create Transport Document,Place in Stock,"Chain Response[Create Transport Document,Place in Stock]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Create Transport Document,Register Customer Order,"Chain Response[Create Transport Document,Register Customer Order]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Create Transport Document,Reschedule Container,"Chain Response[Create Transport Document,Reschedule Container]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Create Transport Document,Weigh,"Chain Response[Create Transport Document,Weigh]",600,594,0,594,6,0.99,0.0,0.0,0.01,1.0,0.99,0.01
+Chain Response,Depart,Book Vehicles,"Chain Response[Depart,Book Vehicles]",600,573,0,573,27,0.955,0.0,0.0,0.045,1.0,0.955,0.045
+Chain Response,Depart,Bring to Loading Bay,"Chain Response[Depart,Bring to Loading Bay]",600,573,0,573,27,0.955,0.0,0.0,0.045,1.0,0.955,0.045
+Chain Response,Depart,Collect Goods,"Chain Response[Depart,Collect Goods]",600,573,0,573,27,0.955,0.0,0.0,0.045,1.0,0.955,0.045
+Chain Response,Depart,Create Transport Document,"Chain Response[Depart,Create Transport Document]",600,573,0,573,27,0.955,0.0,0.0,0.045,1.0,0.955,0.045
+Chain Response,Depart,Drive to Terminal,"Chain Response[Depart,Drive to Terminal]",600,573,0,573,27,0.955,0.0,0.0,0.045,1.0,0.955,0.045
+Chain Response,Depart,Load Truck,"Chain Response[Depart,Load Truck]",600,573,0,573,27,0.955,0.0,0.0,0.045,1.0,0.955,0.045
+Chain Response,Depart,Load to Vehicle,"Chain Response[Depart,Load to Vehicle]",600,573,0,573,27,0.955,0.0,0.0,0.045,1.0,0.955,0.045
+Chain Response,Depart,Order Empty Containers,"Chain Response[Depart,Order Empty Containers]",600,573,0,573,27,0.955,0.0,0.0,0.045,1.0,0.955,0.045
+Chain Response,Depart,Pick Up Empty Container,"Chain Response[Depart,Pick Up Empty Container]",600,573,2,571,27,0.955,0.0034904013961605585,0.0033333333333333335,0.04833333333333333,0.9965095986038395,0.9516666666666667,0.045
+Chain Response,Depart,Place in Stock,"Chain Response[Depart,Place in Stock]",600,573,0,573,27,0.955,0.0,0.0,0.045,1.0,0.955,0.045
+Chain Response,Depart,Register Customer Order,"Chain Response[Depart,Register Customer Order]",600,573,0,573,27,0.955,0.0,0.0,0.045,1.0,0.955,0.045
+Chain Response,Depart,Reschedule Container,"Chain Response[Depart,Reschedule Container]",600,573,0,573,27,0.955,0.0,0.0,0.045,1.0,0.955,0.045
+Chain Response,Depart,Weigh,"Chain Response[Depart,Weigh]",600,573,0,573,27,0.955,0.0,0.0,0.045,1.0,0.955,0.045
+Chain Response,Drive to Terminal,Book Vehicles,"Chain Response[Drive to Terminal,Book Vehicles]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Drive to Terminal,Bring to Loading Bay,"Chain Response[Drive to Terminal,Bring to Loading Bay]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Drive to Terminal,Collect Goods,"Chain Response[Drive to Terminal,Collect Goods]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Drive to Terminal,Create Transport Document,"Chain Response[Drive to Terminal,Create Transport Document]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Drive to Terminal,Depart,"Chain Response[Drive to Terminal,Depart]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Drive to Terminal,Load Truck,"Chain Response[Drive to Terminal,Load Truck]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Drive to Terminal,Load to Vehicle,"Chain Response[Drive to Terminal,Load to Vehicle]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Drive to Terminal,Order Empty Containers,"Chain Response[Drive to Terminal,Order Empty Containers]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Drive to Terminal,Pick Up Empty Container,"Chain Response[Drive to Terminal,Pick Up Empty Container]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Drive to Terminal,Place in Stock,"Chain Response[Drive to Terminal,Place in Stock]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Drive to Terminal,Register Customer Order,"Chain Response[Drive to Terminal,Register Customer Order]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Drive to Terminal,Reschedule Container,"Chain Response[Drive to Terminal,Reschedule Container]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Drive to Terminal,Weigh,"Chain Response[Drive to Terminal,Weigh]",600,587,433,154,13,0.9783333333333334,0.737649063032368,0.7216666666666667,0.7433333333333333,0.262350936967632,0.25666666666666665,0.021666666666666667
+Chain Response,Load Truck,Book Vehicles,"Chain Response[Load Truck,Book Vehicles]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Load Truck,Bring to Loading Bay,"Chain Response[Load Truck,Bring to Loading Bay]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Load Truck,Collect Goods,"Chain Response[Load Truck,Collect Goods]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Load Truck,Create Transport Document,"Chain Response[Load Truck,Create Transport Document]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Load Truck,Depart,"Chain Response[Load Truck,Depart]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Load Truck,Drive to Terminal,"Chain Response[Load Truck,Drive to Terminal]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Load Truck,Load to Vehicle,"Chain Response[Load Truck,Load to Vehicle]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Load Truck,Order Empty Containers,"Chain Response[Load Truck,Order Empty Containers]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Load Truck,Pick Up Empty Container,"Chain Response[Load Truck,Pick Up Empty Container]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Load Truck,Place in Stock,"Chain Response[Load Truck,Place in Stock]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Load Truck,Register Customer Order,"Chain Response[Load Truck,Register Customer Order]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Load Truck,Reschedule Container,"Chain Response[Load Truck,Reschedule Container]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Load Truck,Weigh,"Chain Response[Load Truck,Weigh]",600,588,0,588,12,0.98,0.0,0.0,0.02,1.0,0.98,0.02
+Chain Response,Load to Vehicle,Book Vehicles,"Chain Response[Load to Vehicle,Book Vehicles]",600,578,0,578,22,0.9633333333333334,0.0,0.0,0.03666666666666667,1.0,0.9633333333333334,0.03666666666666667
+Chain Response,Load to Vehicle,Bring to Loading Bay,"Chain Response[Load to Vehicle,Bring to Loading Bay]",600,578,0,578,22,0.9633333333333334,0.0,0.0,0.03666666666666667,1.0,0.9633333333333334,0.03666666666666667
+Chain Response,Load to Vehicle,Collect Goods,"Chain Response[Load to Vehicle,Collect Goods]",600,578,1,577,22,0.9633333333333334,0.0017301038062283738,0.0016666666666666668,0.03833333333333333,0.9982698961937716,0.9616666666666667,0.03666666666666667
+Chain Response,Load to Vehicle,Create Transport Document,"Chain Response[Load to Vehicle,Create Transport Document]",600,578,0,578,22,0.9633333333333334,0.0,0.0,0.03666666666666667,1.0,0.9633333333333334,0.03666666666666667
+Chain Response,Load to Vehicle,Depart,"Chain Response[Load to Vehicle,Depart]",600,578,33,545,22,0.9633333333333334,0.05709342560553633,0.055,0.09166666666666666,0.9429065743944637,0.9083333333333333,0.03666666666666667
+Chain Response,Load to Vehicle,Drive to Terminal,"Chain Response[Load to Vehicle,Drive to Terminal]",600,578,0,578,22,0.9633333333333334,0.0,0.0,0.03666666666666667,1.0,0.9633333333333334,0.03666666666666667
+Chain Response,Load to Vehicle,Load Truck,"Chain Response[Load to Vehicle,Load Truck]",600,578,0,578,22,0.9633333333333334,0.0,0.0,0.03666666666666667,1.0,0.9633333333333334,0.03666666666666667
+Chain Response,Load to Vehicle,Order Empty Containers,"Chain Response[Load to Vehicle,Order Empty Containers]",600,578,0,578,22,0.9633333333333334,0.0,0.0,0.03666666666666667,1.0,0.9633333333333334,0.03666666666666667
+Chain Response,Load to Vehicle,Pick Up Empty Container,"Chain Response[Load to Vehicle,Pick Up Empty Container]",600,578,0,578,22,0.9633333333333334,0.0,0.0,0.03666666666666667,1.0,0.9633333333333334,0.03666666666666667
+Chain Response,Load to Vehicle,Place in Stock,"Chain Response[Load to Vehicle,Place in Stock]",600,578,0,578,22,0.9633333333333334,0.0,0.0,0.03666666666666667,1.0,0.9633333333333334,0.03666666666666667
+Chain Response,Load to Vehicle,Register Customer Order,"Chain Response[Load to Vehicle,Register Customer Order]",600,578,0,578,22,0.9633333333333334,0.0,0.0,0.03666666666666667,1.0,0.9633333333333334,0.03666666666666667
+Chain Response,Load to Vehicle,Reschedule Container,"Chain Response[Load to Vehicle,Reschedule Container]",600,578,0,578,22,0.9633333333333334,0.0,0.0,0.03666666666666667,1.0,0.9633333333333334,0.03666666666666667
+Chain Response,Load to Vehicle,Weigh,"Chain Response[Load to Vehicle,Weigh]",600,578,0,578,22,0.9633333333333334,0.0,0.0,0.03666666666666667,1.0,0.9633333333333334,0.03666666666666667
+Chain Response,Order Empty Containers,Book Vehicles,"Chain Response[Order Empty Containers,Book Vehicles]",600,593,0,593,7,0.9883333333333333,0.0,0.0,0.011666666666666667,1.0,0.9883333333333333,0.011666666666666667
+Chain Response,Order Empty Containers,Bring to Loading Bay,"Chain Response[Order Empty Containers,Bring to Loading Bay]",600,593,0,593,7,0.9883333333333333,0.0,0.0,0.011666666666666667,1.0,0.9883333333333333,0.011666666666666667
+Chain Response,Order Empty Containers,Collect Goods,"Chain Response[Order Empty Containers,Collect Goods]",600,593,116,477,7,0.9883333333333333,0.19561551433389546,0.19333333333333333,0.205,0.8043844856661045,0.795,0.011666666666666667
+Chain Response,Order Empty Containers,Create Transport Document,"Chain Response[Order Empty Containers,Create Transport Document]",600,593,0,593,7,0.9883333333333333,0.0,0.0,0.011666666666666667,1.0,0.9883333333333333,0.011666666666666667
+Chain Response,Order Empty Containers,Depart,"Chain Response[Order Empty Containers,Depart]",600,593,0,593,7,0.9883333333333333,0.0,0.0,0.011666666666666667,1.0,0.9883333333333333,0.011666666666666667
+Chain Response,Order Empty Containers,Drive to Terminal,"Chain Response[Order Empty Containers,Drive to Terminal]",600,593,0,593,7,0.9883333333333333,0.0,0.0,0.011666666666666667,1.0,0.9883333333333333,0.011666666666666667
+Chain Response,Order Empty Containers,Load Truck,"Chain Response[Order Empty Containers,Load Truck]",600,593,0,593,7,0.9883333333333333,0.0,0.0,0.011666666666666667,1.0,0.9883333333333333,0.011666666666666667
+Chain Response,Order Empty Containers,Load to Vehicle,"Chain Response[Order Empty Containers,Load to Vehicle]",600,593,0,593,7,0.9883333333333333,0.0,0.0,0.011666666666666667,1.0,0.9883333333333333,0.011666666666666667
+Chain Response,Order Empty Containers,Pick Up Empty Container,"Chain Response[Order Empty Containers,Pick Up Empty Container]",600,593,473,120,7,0.9883333333333333,0.7976391231028668,0.7883333333333333,0.8,0.20236087689713322,0.2,0.011666666666666667
+Chain Response,Order Empty Containers,Place in Stock,"Chain Response[Order Empty Containers,Place in Stock]",600,593,0,593,7,0.9883333333333333,0.0,0.0,0.011666666666666667,1.0,0.9883333333333333,0.011666666666666667
+Chain Response,Order Empty Containers,Register Customer Order,"Chain Response[Order Empty Containers,Register Customer Order]",600,593,0,593,7,0.9883333333333333,0.0,0.0,0.011666666666666667,1.0,0.9883333333333333,0.011666666666666667
+Chain Response,Order Empty Containers,Reschedule Container,"Chain Response[Order Empty Containers,Reschedule Container]",600,593,0,593,7,0.9883333333333333,0.0,0.0,0.011666666666666667,1.0,0.9883333333333333,0.011666666666666667
+Chain Response,Order Empty Containers,Weigh,"Chain Response[Order Empty Containers,Weigh]",600,593,0,593,7,0.9883333333333333,0.0,0.0,0.011666666666666667,1.0,0.9883333333333333,0.011666666666666667
+Chain Response,Pick Up Empty Container,Book Vehicles,"Chain Response[Pick Up Empty Container,Book Vehicles]",600,589,0,589,11,0.9816666666666667,0.0,0.0,0.018333333333333333,1.0,0.9816666666666667,0.018333333333333333
+Chain Response,Pick Up Empty Container,Bring to Loading Bay,"Chain Response[Pick Up Empty Container,Bring to Loading Bay]",600,589,0,589,11,0.9816666666666667,0.0,0.0,0.018333333333333333,1.0,0.9816666666666667,0.018333333333333333
+Chain Response,Pick Up Empty Container,Collect Goods,"Chain Response[Pick Up Empty Container,Collect Goods]",600,589,347,242,11,0.9816666666666667,0.5891341256366723,0.5783333333333334,0.5966666666666667,0.41086587436332767,0.4033333333333333,0.018333333333333333
+Chain Response,Pick Up Empty Container,Create Transport Document,"Chain Response[Pick Up Empty Container,Create Transport Document]",600,589,0,589,11,0.9816666666666667,0.0,0.0,0.018333333333333333,1.0,0.9816666666666667,0.018333333333333333
+Chain Response,Pick Up Empty Container,Depart,"Chain Response[Pick Up Empty Container,Depart]",600,589,0,589,11,0.9816666666666667,0.0,0.0,0.018333333333333333,1.0,0.9816666666666667,0.018333333333333333
+Chain Response,Pick Up Empty Container,Drive to Terminal,"Chain Response[Pick Up Empty Container,Drive to Terminal]",600,589,0,589,11,0.9816666666666667,0.0,0.0,0.018333333333333333,1.0,0.9816666666666667,0.018333333333333333
+Chain Response,Pick Up Empty Container,Load Truck,"Chain Response[Pick Up Empty Container,Load Truck]",600,589,0,589,11,0.9816666666666667,0.0,0.0,0.018333333333333333,1.0,0.9816666666666667,0.018333333333333333
+Chain Response,Pick Up Empty Container,Load to Vehicle,"Chain Response[Pick Up Empty Container,Load to Vehicle]",600,589,0,589,11,0.9816666666666667,0.0,0.0,0.018333333333333333,1.0,0.9816666666666667,0.018333333333333333
+Chain Response,Pick Up Empty Container,Order Empty Containers,"Chain Response[Pick Up Empty Container,Order Empty Containers]",600,589,0,589,11,0.9816666666666667,0.0,0.0,0.018333333333333333,1.0,0.9816666666666667,0.018333333333333333
+Chain Response,Pick Up Empty Container,Place in Stock,"Chain Response[Pick Up Empty Container,Place in Stock]",600,589,0,589,11,0.9816666666666667,0.0,0.0,0.018333333333333333,1.0,0.9816666666666667,0.018333333333333333
+Chain Response,Pick Up Empty Container,Register Customer Order,"Chain Response[Pick Up Empty Container,Register Customer Order]",600,589,0,589,11,0.9816666666666667,0.0,0.0,0.018333333333333333,1.0,0.9816666666666667,0.018333333333333333
+Chain Response,Pick Up Empty Container,Reschedule Container,"Chain Response[Pick Up Empty Container,Reschedule Container]",600,589,0,589,11,0.9816666666666667,0.0,0.0,0.018333333333333333,1.0,0.9816666666666667,0.018333333333333333
+Chain Response,Pick Up Empty Container,Weigh,"Chain Response[Pick Up Empty Container,Weigh]",600,589,0,589,11,0.9816666666666667,0.0,0.0,0.018333333333333333,1.0,0.9816666666666667,0.018333333333333333
+Chain Response,Place in Stock,Book Vehicles,"Chain Response[Place in Stock,Book Vehicles]",600,581,0,581,19,0.9683333333333334,0.0,0.0,0.03166666666666667,1.0,0.9683333333333334,0.03166666666666667
+Chain Response,Place in Stock,Bring to Loading Bay,"Chain Response[Place in Stock,Bring to Loading Bay]",600,581,33,548,19,0.9683333333333334,0.05679862306368331,0.055,0.08666666666666667,0.9432013769363167,0.9133333333333333,0.03166666666666667
+Chain Response,Place in Stock,Collect Goods,"Chain Response[Place in Stock,Collect Goods]",600,581,6,575,19,0.9683333333333334,0.010327022375215147,0.01,0.041666666666666664,0.9896729776247849,0.9583333333333334,0.03166666666666667
+Chain Response,Place in Stock,Create Transport Document,"Chain Response[Place in Stock,Create Transport Document]",600,581,0,581,19,0.9683333333333334,0.0,0.0,0.03166666666666667,1.0,0.9683333333333334,0.03166666666666667
+Chain Response,Place in Stock,Depart,"Chain Response[Place in Stock,Depart]",600,581,0,581,19,0.9683333333333334,0.0,0.0,0.03166666666666667,1.0,0.9683333333333334,0.03166666666666667
+Chain Response,Place in Stock,Drive to Terminal,"Chain Response[Place in Stock,Drive to Terminal]",600,581,0,581,19,0.9683333333333334,0.0,0.0,0.03166666666666667,1.0,0.9683333333333334,0.03166666666666667
+Chain Response,Place in Stock,Load Truck,"Chain Response[Place in Stock,Load Truck]",600,581,1,580,19,0.9683333333333334,0.0017211703958691911,0.0016666666666666668,0.03333333333333333,0.9982788296041308,0.9666666666666667,0.03166666666666667
+Chain Response,Place in Stock,Load to Vehicle,"Chain Response[Place in Stock,Load to Vehicle]",600,581,1,580,19,0.9683333333333334,0.0017211703958691911,0.0016666666666666668,0.03333333333333333,0.9982788296041308,0.9666666666666667,0.03166666666666667
+Chain Response,Place in Stock,Order Empty Containers,"Chain Response[Place in Stock,Order Empty Containers]",600,581,0,581,19,0.9683333333333334,0.0,0.0,0.03166666666666667,1.0,0.9683333333333334,0.03166666666666667
+Chain Response,Place in Stock,Pick Up Empty Container,"Chain Response[Place in Stock,Pick Up Empty Container]",600,581,17,564,19,0.9683333333333334,0.029259896729776247,0.028333333333333332,0.06,0.9707401032702238,0.94,0.03166666666666667
+Chain Response,Place in Stock,Register Customer Order,"Chain Response[Place in Stock,Register Customer Order]",600,581,0,581,19,0.9683333333333334,0.0,0.0,0.03166666666666667,1.0,0.9683333333333334,0.03166666666666667
+Chain Response,Place in Stock,Reschedule Container,"Chain Response[Place in Stock,Reschedule Container]",600,581,0,581,19,0.9683333333333334,0.0,0.0,0.03166666666666667,1.0,0.9683333333333334,0.03166666666666667
+Chain Response,Place in Stock,Weigh,"Chain Response[Place in Stock,Weigh]",600,581,0,581,19,0.9683333333333334,0.0,0.0,0.03166666666666667,1.0,0.9683333333333334,0.03166666666666667
+Chain Response,Register Customer Order,Book Vehicles,"Chain Response[Register Customer Order,Book Vehicles]",600,600,0,600,0,1.0,0.0,0.0,0.0,1.0,1.0,0.0
+Chain Response,Register Customer Order,Bring to Loading Bay,"Chain Response[Register Customer Order,Bring to Loading Bay]",600,600,0,600,0,1.0,0.0,0.0,0.0,1.0,1.0,0.0
+Chain Response,Register Customer Order,Collect Goods,"Chain Response[Register Customer Order,Collect Goods]",600,600,0,600,0,1.0,0.0,0.0,0.0,1.0,1.0,0.0
+Chain Response,Register Customer Order,Create Transport Document,"Chain Response[Register Customer Order,Create Transport Document]",600,600,594,6,0,1.0,0.99,0.99,0.99,0.01,0.01,0.0
+Chain Response,Register Customer Order,Depart,"Chain Response[Register Customer Order,Depart]",600,600,0,600,0,1.0,0.0,0.0,0.0,1.0,1.0,0.0
+Chain Response,Register Customer Order,Drive to Terminal,"Chain Response[Register Customer Order,Drive to Terminal]",600,600,0,600,0,1.0,0.0,0.0,0.0,1.0,1.0,0.0
+Chain Response,Register Customer Order,Load Truck,"Chain Response[Register Customer Order,Load Truck]",600,600,0,600,0,1.0,0.0,0.0,0.0,1.0,1.0,0.0
+Chain Response,Register Customer Order,Load to Vehicle,"Chain Response[Register Customer Order,Load to Vehicle]",600,600,0,600,0,1.0,0.0,0.0,0.0,1.0,1.0,0.0
+Chain Response,Register Customer Order,Order Empty Containers,"Chain Response[Register Customer Order,Order Empty Containers]",600,600,0,600,0,1.0,0.0,0.0,0.0,1.0,1.0,0.0
+Chain Response,Register Customer Order,Pick Up Empty Container,"Chain Response[Register Customer Order,Pick Up Empty Container]",600,600,0,600,0,1.0,0.0,0.0,0.0,1.0,1.0,0.0
+Chain Response,Register Customer Order,Place in Stock,"Chain Response[Register Customer Order,Place in Stock]",600,600,0,600,0,1.0,0.0,0.0,0.0,1.0,1.0,0.0
+Chain Response,Register Customer Order,Reschedule Container,"Chain Response[Register Customer Order,Reschedule Container]",600,600,0,600,0,1.0,0.0,0.0,0.0,1.0,1.0,0.0
+Chain Response,Register Customer Order,Weigh,"Chain Response[Register Customer Order,Weigh]",600,600,0,600,0,1.0,0.0,0.0,0.0,1.0,1.0,0.0
+Chain Response,Reschedule Container,Book Vehicles,"Chain Response[Reschedule Container,Book Vehicles]",600,33,0,33,567,0.055,0.0,0.0,0.945,1.0,0.055,0.945
+Chain Response,Reschedule Container,Bring to Loading Bay,"Chain Response[Reschedule Container,Bring to Loading Bay]",600,33,0,33,567,0.055,0.0,0.0,0.945,1.0,0.055,0.945
+Chain Response,Reschedule Container,Collect Goods,"Chain Response[Reschedule Container,Collect Goods]",600,33,3,30,567,0.055,0.09090909090909091,0.005,0.95,0.9090909090909091,0.05,0.945
+Chain Response,Reschedule Container,Create Transport Document,"Chain Response[Reschedule Container,Create Transport Document]",600,33,0,33,567,0.055,0.0,0.0,0.945,1.0,0.055,0.945
+Chain Response,Reschedule Container,Depart,"Chain Response[Reschedule Container,Depart]",600,33,0,33,567,0.055,0.0,0.0,0.945,1.0,0.055,0.945
+Chain Response,Reschedule Container,Drive to Terminal,"Chain Response[Reschedule Container,Drive to Terminal]",600,33,3,30,567,0.055,0.09090909090909091,0.005,0.95,0.9090909090909091,0.05,0.945
+Chain Response,Reschedule Container,Load Truck,"Chain Response[Reschedule Container,Load Truck]",600,33,0,33,567,0.055,0.0,0.0,0.945,1.0,0.055,0.945
+Chain Response,Reschedule Container,Load to Vehicle,"Chain Response[Reschedule Container,Load to Vehicle]",600,33,19,14,567,0.055,0.5757575757575758,0.03166666666666667,0.9766666666666667,0.42424242424242425,0.023333333333333334,0.945
+Chain Response,Reschedule Container,Order Empty Containers,"Chain Response[Reschedule Container,Order Empty Containers]",600,33,0,33,567,0.055,0.0,0.0,0.945,1.0,0.055,0.945
+Chain Response,Reschedule Container,Pick Up Empty Container,"Chain Response[Reschedule Container,Pick Up Empty Container]",600,33,3,30,567,0.055,0.09090909090909091,0.005,0.95,0.9090909090909091,0.05,0.945
+Chain Response,Reschedule Container,Place in Stock,"Chain Response[Reschedule Container,Place in Stock]",600,33,0,33,567,0.055,0.0,0.0,0.945,1.0,0.055,0.945
+Chain Response,Reschedule Container,Register Customer Order,"Chain Response[Reschedule Container,Register Customer Order]",600,33,0,33,567,0.055,0.0,0.0,0.945,1.0,0.055,0.945
+Chain Response,Reschedule Container,Weigh,"Chain Response[Reschedule Container,Weigh]",600,33,1,32,567,0.055,0.030303030303030304,0.0016666666666666668,0.9466666666666667,0.9696969696969697,0.05333333333333334,0.945
+Chain Response,Weigh,Book Vehicles,"Chain Response[Weigh,Book Vehicles]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Weigh,Bring to Loading Bay,"Chain Response[Weigh,Bring to Loading Bay]",600,587,5,582,13,0.9783333333333334,0.008517887563884156,0.008333333333333333,0.03,0.9914821124361158,0.97,0.021666666666666667
+Chain Response,Weigh,Collect Goods,"Chain Response[Weigh,Collect Goods]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Weigh,Create Transport Document,"Chain Response[Weigh,Create Transport Document]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Weigh,Depart,"Chain Response[Weigh,Depart]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Weigh,Drive to Terminal,"Chain Response[Weigh,Drive to Terminal]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Weigh,Load Truck,"Chain Response[Weigh,Load Truck]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Weigh,Load to Vehicle,"Chain Response[Weigh,Load to Vehicle]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Weigh,Order Empty Containers,"Chain Response[Weigh,Order Empty Containers]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Weigh,Pick Up Empty Container,"Chain Response[Weigh,Pick Up Empty Container]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Weigh,Place in Stock,"Chain Response[Weigh,Place in Stock]",600,587,384,203,13,0.9783333333333334,0.6541737649063032,0.64,0.6616666666666666,0.34582623509369675,0.3383333333333333,0.021666666666666667
+Chain Response,Weigh,Register Customer Order,"Chain Response[Weigh,Register Customer Order]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667
+Chain Response,Weigh,Reschedule Container,"Chain Response[Weigh,Reschedule Container]",600,587,0,587,13,0.9783333333333334,0.0,0.0,0.021666666666666667,1.0,0.9783333333333334,0.021666666666666667

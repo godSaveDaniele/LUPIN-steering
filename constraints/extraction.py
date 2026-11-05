@@ -248,15 +248,15 @@ def evaluate_constraint(
 
 
 def main():
-    log_name= "bpic2017_o"
+    log_name= "logistics"
     df = pd.read_csv("event_log/"+ log_name + ".csv")
 
 
     # Template DECLARE da analizzare
     TEMPLATES = [
-        "Response", #se avviene A, B deve avvenire successivamente 
+      #  "Response", #se avviene A, B deve avvenire successivamente 
       #  "Precedence", #B può avvenire solo se A è avvenuto prima
-      #  "Chain Response", #se avviene A l'elemento immediatamente successivo è B
+        "Chain Response", #se avviene A l'elemento immediatamente successivo è B
     ]
 
     # Filtri per selezionare vincoli interessanti
@@ -409,7 +409,6 @@ def main():
             selected_df[
                 columns_to_show
             ]
-            .head(30)
             .to_string(
                 index=False,
                 float_format=lambda x: f"{x:.3f}"
