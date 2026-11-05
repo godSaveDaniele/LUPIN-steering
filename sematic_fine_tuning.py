@@ -1,4 +1,4 @@
-"""Fine-tuning LUPIN sul training originale con loss soft Response e cross-entropy opzionale."""
+"""Fine-tuning LUPIN sul training originale con loss soft Response o Chain Response e cross-entropy opzionale."""
 import argparse
 import json
 import math
@@ -12,6 +12,7 @@ from transformers import AutoModel, AutoTokenizer
 from tqdm.auto import tqdm
 
 from constrained_fine_tuning import freeze_model
+from semantic_loss.chain_response_loss import ChainResponseSoftLoss
 from semantic_loss.response_loss import ResponseSoftLoss
 from neural_network.HistoryDataset import CustomDataset
 from neural_network.llamp_multiout import BertMultiOutputClassificationHeads
@@ -21,6 +22,7 @@ from utility import reproducibility
 BASE_MODEL = "prajjwal1/bert-medium"
 MAX_LENGTH = 512
 VALIDATION_SIZE = 0.2
+SEMANTIC_LOSSES = {"Response": ResponseSoftLoss, "Chain Response": ChainResponseSoftLoss}
 
 
 def read_pickle(path):
@@ -167,7 +169,8 @@ def fine_tune(args):
     activation, target = normalize(args.activation), normalize(args.target)
     if any(a not in label2id or a == "ENDactivity" for a in (activation, target)):
         raise ValueError("Attività del vincolo non valide.")
-    criterion = ResponseSoftLoss(label2id[activation], label2id[target], label2id["ENDactivity"])
+    template = getattr(args, "template", "Response")
+    criterion = SEMANTIC_LOSSES[template](label2id[activation], label2id[target], label2id["ENDactivity"])
     prefixes = [[label2id[a] for a in prefix] for prefix in prefixes]
     train_indices, val_indices = train_test_split(
         list(range(len(texts))), test_size=VALIDATION_SIZE, random_state=args.seed
@@ -189,9 +192,11 @@ def fine_tune(args):
     optimizer = torch.optim.AdamW(
         [p for p in model.parameters() if p.requires_grad], lr=args.learning_rate, weight_decay=0.01
     )
-    output_dir = Path("models") / args.dataset / "semantic_response" / f"{args.mode}_seed{args.seed}"
+    template_slug = template.lower().replace(" ", "_")
+    output_dir = Path("models") / args.dataset / f"semantic_{template_slug}" / f"{args.mode}_seed{args.seed}"
     output_dir.mkdir(parents=True, exist_ok=True)
-    config = dict(vars(args), checkpoint=str(checkpoint), loss="ce_plus_response_soft" if args.dual_objective else "response_soft_only",
+    loss_name = f"ce_plus_{template_slug}_soft" if args.dual_objective else f"{template_slug}_soft_only"
+    config = dict(vars(args), checkpoint=str(checkpoint), template=template, loss=loss_name,
                   base_model=BASE_MODEL, max_length=MAX_LENGTH,
                   validation_size=VALIDATION_SIZE, weight_decay=0.01,
                   best_selection="validation_total_loss")
@@ -200,8 +205,8 @@ def fine_tune(args):
         pickle.dump(id2label, file)
     print("Device:", device)
     print("Seed:", args.seed)
-    print("Obiettivo:", f"CE + {args.semantic_weight} * Response"
-          if args.dual_objective else "Solo Response (CE monitorata, lambda ignorato)")
+    print("Obiettivo:", f"CE + {args.semantic_weight} * {template}"
+          if args.dual_objective else f"Solo {template} (CE monitorata, lambda ignorato)")
     print("Prefissi training/validation:", len(train_indices), len(val_indices))
     print("Checkpoint in:", output_dir)
     train_llm(model, train_loader, val_loader, optimizer, args.epochs,
@@ -214,6 +219,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", required=True)
     parser.add_argument("--checkpoint")
+    parser.add_argument("--template", choices=SEMANTIC_LOSSES, default="Response")
     parser.add_argument("--activation", required=True)
     parser.add_argument("--target", required=True)
     parser.add_argument("--mode", choices=["heads_only", "full_short", "top_k"], default="heads_only")
@@ -222,7 +228,7 @@ def main():
     parser.add_argument("--epochs", type=int, default=3)
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--dual-objective", action="store_true",
-                        help="Ottimizza CE + lambda * Response; default: sola Response.")
+                        help="Ottimizza CE + lambda * loss semantica. Default: sola loss semantica.")
     parser.add_argument("--lambda", dest="semantic_weight", type=float, default=1.0,
                         help="Peso della loss semantica nel doppio obiettivo (default: 1).")
     parser.add_argument("--seed", type=int, default=reproducibility.SEED)

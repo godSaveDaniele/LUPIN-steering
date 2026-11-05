@@ -5,8 +5,7 @@ from collections import Counter
 from pathlib import Path
 from jellyfish import damerau_levenshtein_distance
 
-INPUT_DIR = Path('/Users/daniele/Desktop/esperimenti/8_steering_secondo_vincolo/risultati parziali/')
-# Stesso ordine usato durante lo steering originale.
+INPUT_DIR = Path('/Users/daniele/Desktop/esperimenti/9_steering_logistics_compliant_subset_seed_42/risultati_parziali/')
 
 ALPHAS = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.5]
 OUTPUT_FILE = INPUT_DIR.parent / 'risultati importanti/new_results.csv'
@@ -29,9 +28,23 @@ def main():
         raise ValueError(f'Trovati {len(files)} file, ma specificati {len(ALPHAS)} alpha.')
     if len(set(ALPHAS)) != len(ALPHAS):
         raise ValueError('La lista ALPHAS contiene duplicati.')
+    # I vecchi esperimenti possono avere soltanto examples.jsonl.
+    metadata_path = files[0].with_name('metrics.json')
+    metadata = json.loads(metadata_path.read_text(encoding='utf-8')) if metadata_path.is_file() else {}
+    activation_activity = None
+    if metadata.get('dataset') == 'logistics':
+        constraint = metadata['constraint']
+        # In Precedence[A, B] è B ad attivare l'obbligo.
+        activation_activity = constraint['target' if constraint['template'] == 'Precedence' else 'activation']
+
     results, reference = [], None
     for alpha, path in zip(ALPHAS, files):
         counts = Counter()
+        total_activations = 0
+        if activation_activity is not None:
+            run_metadata = json.loads(path.with_name('metrics.json').read_text(encoding='utf-8'))
+            if run_metadata.get('dataset') != 'logistics' or run_metadata.get('constraint') != constraint:
+                raise ValueError(f'Dataset o vincolo diverso in {path}')
         scores, compliant_scores = [], []
         examples = {}
         with path.open(encoding='utf-8') as file:
@@ -47,6 +60,9 @@ def main():
                     raise ValueError(f'Stato del vincolo non valido in {path}')
                 examples[index] = (tuple(item['prefix_activities']), tuple(item['true_suffix']), real_state)
                 counts[state] += 1
+                if activation_activity is not None:
+                    total_activations += item['prefix_activities'].count(activation_activity)
+                    total_activations += item['predicted_suffix'].count(activation_activity)
                 score = dls(item['predicted_suffix'], item['true_suffix'])
                 scores.append(score)
                 if real_state in {'fulfilled', 'vacuous'}:
@@ -71,6 +87,8 @@ def main():
             'violated': v,
             'vacuous': u,
         })
+        if activation_activity is not None:
+            results[-1]['mean_activations_per_trace'] = total_activations / n
         print(f'alpha={alpha:g}: {n} esempi, {len(compliant_scores)} reali compliant; {path.parent.name}')
     results.sort(key=lambda row: row['alpha'])
     OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)

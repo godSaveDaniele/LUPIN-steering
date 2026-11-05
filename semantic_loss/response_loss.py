@@ -164,33 +164,9 @@ class ResponseSoftLoss(nn.Module):
             print(mass_b)
 
 
-        # OR delle B strettamente SUCCESSIVE a t (prodotto inverso esclusivo).
-        prob_no_b_from_here = torch.flip(
-            torch.cumprod(torch.flip(1 - mass_b, dims=[1]), dim=1), dims=[1]
-        )
-        #ogni elemento contiene il prodotto (1 - massa_B) dall'istante corrente fino alla fine
+        target_after = self._target_after(mass_b, lengths, width)
 
-        if self.verbose:
-            print("-"*20)
-            print ("Probabilità di non osservare B tra l'istante corrente e la fine")
-            print(prob_no_b_from_here)
-
-
-        no_b_after = torch.cat((prob_no_b_from_here[:, 1:], ones), dim=1)
-        #si shifta tutti di uno
-        prob_almeno_un_b_after = 1 - no_b_after
-
-        if self.verbose:
-            print("-"*20)
-            print("Probabilità di non osservare B a partire dall'istante successivo")
-            print(no_b_after)
-
-        if self.verbose:
-            print("-"*20)
-            print("Probabilità di osservare almeno un B a partire dall'istante di tempo successivo")
-            print(prob_almeno_un_b_after)
-
-        implications = (1 - mass_a * (1 - prob_almeno_un_b_after)).clamp(0, 1)
+        implications = (1 - mass_a * (1 - target_after)).clamp(0, 1)
         #per ogni prefisso, e per ogni istante di tempo, ho la probabilità che 
         # l'implicazione sia verificata
 
@@ -222,6 +198,35 @@ class ResponseSoftLoss(nn.Module):
         #La loss finale si ottiene come media sul batch
 
         return {"satisfaction": score, "loss_per_example": per_example, "loss": per_example.mean()}
+
+    def _target_after(self, mass_b, prefix_lengths, prefix_width):
+        ones = mass_b.new_ones((mass_b.size(0), 1))
+        # OR delle B strettamente SUCCESSIVE a t (prodotto inverso esclusivo).
+        prob_no_b_from_here = torch.flip(
+            torch.cumprod(torch.flip(1 - mass_b, dims=[1]), dim=1), dims=[1]
+        )
+        #ogni elemento contiene il prodotto (1 - massa_B) dall'istante corrente fino alla fine
+
+        if self.verbose:
+            print("-"*20)
+            print ("Probabilità di non osservare B tra l'istante corrente e la fine")
+            print(prob_no_b_from_here)
+
+
+        no_b_after = torch.cat((prob_no_b_from_here[:, 1:], ones), dim=1)
+        #si shifta tutti di uno
+        prob_almeno_un_b_after = 1 - no_b_after
+
+        if self.verbose:
+            print("-"*20)
+            print("Probabilità di non osservare B a partire dall'istante successivo")
+            print(no_b_after)
+
+        if self.verbose:
+            print("-"*20)
+            print("Probabilità di osservare almeno un B a partire dall'istante di tempo successivo")
+            print(prob_almeno_un_b_after)
+        return prob_almeno_un_b_after
 
 
 
